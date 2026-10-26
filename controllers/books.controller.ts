@@ -47,15 +47,15 @@ function isValidSpineGuess(value: unknown): value is SpineGuess {
  * (and logs why) if the lookup fails, finds nothing, or the best match is
  * too weak to trust.
  */
-async function lookUpBook({
-  title,
-  author,
-}: SpineGuess): Promise<ScoredBook | null> {
+async function lookUpBook(
+  { title, author }: SpineGuess,
+  quotaUser?: string,
+): Promise<ScoredBook | null> {
   const query = author ? `${title} ${author}` : title;
 
   let candidates;
   try {
-    candidates = await searchWithRetryLadder(query);
+    candidates = await searchWithRetryLadder(query, quotaUser);
   } catch (err) {
     logger.warn({ query, err }, "Google Books lookup failed");
     return null;
@@ -107,10 +107,18 @@ export async function searchBooks(req: Request, res: Response) {
   }
 
   try {
-    const books = await searchBooksByQuery(q);
+    const books = await searchBooksByQuery(q, req.user?.uid);
     res.json({ books });
   } catch (err) {
     logger.error({ err, q }, "search-books failed");
+
+    // querySingle throws "Google Books API error: <status>"
+    const throttled = err instanceof Error && err.message.endsWith("429");
+    if (throttled) {
+      return res
+        .status(503)
+        .json({ error: "Search is busy, try again shortly" });
+    }
     res.status(502).json({ error: "Failed to reach Google Books" });
   }
 }
@@ -228,7 +236,9 @@ export async function identifyBooks(req: Request, res: Response) {
 
     // Lookups run in parallel; a failed one only drops that book.
     const lookupStart = Date.now();
-    const matches = await Promise.all(identified.map(lookUpBook));
+    const matches = await Promise.all(
+      identified.map((guess) => lookUpBook(guess, req.user?.uid)),
+    );
     const books = dedupeByTitle(
       matches.filter((m): m is ScoredBook => m !== null),
     );

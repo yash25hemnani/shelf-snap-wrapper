@@ -70,9 +70,15 @@ function parseItem(item: GoogleBooksItem): Book {
   };
 }
 
-/** One Google Books request; transient failures (429 / 5xx) retry once. */
-async function querySingle(query: string): Promise<Book[]> {
-  const url = `${BASE_URL}?q=${encodeURIComponent(query)}&key=${GOOGLE_BOOKS_API_KEY}`;
+/**
+ * One Google Books request; transient failures (429 / 5xx) retry once.
+ * [quotaUser] makes Google count requests per app user instead of per
+ * server IP, which Vercel shares with many other apps.
+ */
+async function querySingle(query: string, quotaUser?: string): Promise<Book[]> {
+  const params = new URLSearchParams({ q: query, key: GOOGLE_BOOKS_API_KEY! });
+  if (quotaUser) params.set("quotaUser", quotaUser);
+  const url = `${BASE_URL}?${params}`;
 
   let response = await fetch(url);
   // 429 (rate limited) and 5xx are usually transient; parallel lookups make
@@ -95,8 +101,9 @@ async function querySingle(query: string): Promise<Book[]> {
 /** Single Google Books search for user-typed queries (no retry ladder). */
 export async function searchBooksByQuery(
   query: string,
+  quotaUser?: string,
 ): Promise<Book[]> {
-  return querySingle(query);
+  return querySingle(query, quotaUser);
 }
 
 /**
@@ -107,11 +114,15 @@ export async function searchBooksByQuery(
  */
 export async function searchWithRetryLadder(
   query: string,
+  quotaUser?: string,
 ): Promise<Book[]> {
   const words = query.trim().split(/\s+/).filter(Boolean);
 
   for (let len = words.length; len >= 1; len--) {
-    const results = await querySingle(words.slice(0, len).join(" "));
+    const results = await querySingle(
+      words.slice(0, len).join(" "),
+      quotaUser,
+    );
     if (results.length > 0) return results;
   }
 
