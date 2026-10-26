@@ -1,12 +1,21 @@
 import { logger } from "../utils/logger";
-import { BookDetails } from "../types/books.types";
+import { Book } from "../types/books.types";
+import { toIsbn13 } from "../utils/isbn";
 
 interface GoogleBooksItem {
+  id?: string;
   volumeInfo?: {
     title?: string;
+    subtitle?: string;
     authors?: string[];
+    publisher?: string;
     industryIdentifiers?: { type: string; identifier: string }[];
     imageLinks?: { thumbnail?: string };
+    description?: string;
+    publishedDate?: string;
+    pageCount?: number;
+    categories?: string[];
+    language?: string;
   };
 }
 
@@ -20,25 +29,49 @@ if (!GOOGLE_BOOKS_API_KEY) {
   process.exit(1);
 }
 
-function parseItem(item: GoogleBooksItem): BookDetails {
+/** Google descriptions can carry <p>, <b>, <br> and entities. */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<br\s*\/?>|<\/p>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function parseItem(item: GoogleBooksItem): Book {
   const info = item.volumeInfo ?? {};
   const identifiers = info.industryIdentifiers ?? [];
   const isbn =
     identifiers.find((id) => id.type === "ISBN_13")?.identifier ??
-    identifiers.find((id) => id.type === "ISBN_10")?.identifier ??
-    null;
+    identifiers.find((id) => id.type === "ISBN_10")?.identifier;
 
   return {
+    googleBooksId: item.id ?? null,
+    workId: null,
+    isbn: isbn ? toIsbn13(isbn) : null,
     title: info.title ?? "Unknown Title",
-    author: info.authors?.join(", ") ?? null,
-    isbn,
+    subtitle: info.subtitle ?? null,
+    authors: info.authors ?? [],
+    description: info.description ? stripHtml(info.description) : null,
+    categories: info.categories ?? [],
+    publisher: info.publisher ?? null,
+    publishedDate: info.publishedDate ?? null,
+    pageCount: info.pageCount ?? null,
+    language: info.language ?? null, // already ISO 639-1
     // Google serves http:// thumbnails; Android blocks cleartext by default.
     coverUrl: info.imageLinks?.thumbnail?.replace(/^http:/, "https:") ?? null,
+    source: "google",
   };
 }
 
 /** One Google Books request; transient failures (429 / 5xx) retry once. */
-async function querySingle(query: string): Promise<BookDetails[]> {
+async function querySingle(query: string): Promise<Book[]> {
   const url = `${BASE_URL}?q=${encodeURIComponent(query)}&key=${GOOGLE_BOOKS_API_KEY}`;
 
   let response = await fetch(url);
@@ -62,7 +95,7 @@ async function querySingle(query: string): Promise<BookDetails[]> {
 /** Single Google Books search for user-typed queries (no retry ladder). */
 export async function searchBooksByQuery(
   query: string,
-): Promise<BookDetails[]> {
+): Promise<Book[]> {
   return querySingle(query);
 }
 
@@ -74,7 +107,7 @@ export async function searchBooksByQuery(
  */
 export async function searchWithRetryLadder(
   query: string,
-): Promise<BookDetails[]> {
+): Promise<Book[]> {
   const words = query.trim().split(/\s+/).filter(Boolean);
 
   for (let len = words.length; len >= 1; len--) {

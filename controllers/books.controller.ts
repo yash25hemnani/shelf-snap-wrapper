@@ -18,7 +18,7 @@ import {
 } from "../services/google-books.service";
 import { parseIsbn, searchByIsbn } from "../services/open-library.service";
 import { scoreAndRank } from "../services/match-scoring.service";
-import { Book, ScoredBook } from "../types/books.types";
+import { ScoredBook, SpineGuess } from "../types/books.types";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
@@ -29,12 +29,16 @@ if (!GROQ_API_KEY) {
 
 const groq = new Groq({ apiKey: GROQ_API_KEY });
 
-function isBook(value: unknown): value is Book {
+/**
+ * True if [value] is an object with a string title and author. Groq's JSON
+ * mode guarantees valid JSON but not this shape, so each entry is checked.
+ */
+function isValidSpineGuess(value: unknown): value is SpineGuess {
   return (
     typeof value === "object" &&
     value !== null &&
-    typeof (value as Book).title === "string" &&
-    typeof (value as Book).author === "string"
+    typeof (value as SpineGuess).title === "string" &&
+    typeof (value as SpineGuess).author === "string"
   );
 }
 
@@ -43,7 +47,10 @@ function isBook(value: unknown): value is Book {
  * (and logs why) if the lookup fails, finds nothing, or the best match is
  * too weak to trust.
  */
-async function lookUpBook({ title, author }: Book): Promise<ScoredBook | null> {
+async function lookUpBook({
+  title,
+  author,
+}: SpineGuess): Promise<ScoredBook | null> {
   const query = author ? `${title} ${author}` : title;
 
   let candidates;
@@ -64,7 +71,7 @@ async function lookUpBook({ title, author }: Book): Promise<ScoredBook | null> {
       {
         query,
         matchTitle: topMatch.title,
-        matchAuthor: topMatch.author,
+        matchAuthors: topMatch.authors,
         score: Number(topMatch.score.toFixed(2)),
       },
       "Rejected weak match",
@@ -128,6 +135,7 @@ export async function searchBookByIsbn(req: Request, res: Response) {
   }
 }
 
+// Identify books from an image using groq
 export async function identifyBooks(req: Request, res: Response) {
   const { image, imageMimeType, imageWidth, imageHeight } = req.body ?? {};
   const blocks = req.body?.blocks ?? [];
@@ -180,7 +188,9 @@ export async function identifyBooks(req: Request, res: Response) {
       ],
       response_format: { type: "json_object" },
     });
+
     const responseText = completion.choices[0]?.message?.content ?? "";
+
     logger.info(
       { durationMs: Date.now() - groqStart, responseText },
       "Groq call completed",
@@ -189,6 +199,7 @@ export async function identifyBooks(req: Request, res: Response) {
     // JSON object mode guarantees syntactically valid JSON but not that it
     // matches RESPONSE_SCHEMA, so we still guard the parse and the shape.
     let parsed: { books?: unknown };
+
     try {
       parsed = JSON.parse(responseText);
     } catch (err) {
@@ -196,6 +207,7 @@ export async function identifyBooks(req: Request, res: Response) {
       return res.status(502).json({ error: "Groq returned malformed JSON" });
     }
 
+    // Check if returned response has books array
     if (!Array.isArray(parsed?.books)) {
       logger.error({ parsed }, "Groq response had no books array");
       return res
@@ -203,9 +215,10 @@ export async function identifyBooks(req: Request, res: Response) {
         .json({ error: "Groq response had no books array" });
     }
 
-    const identified: Book[] = parsed.books
-      .filter(isBook)
+    const identified: SpineGuess[] = parsed.books
+      .filter(isValidSpineGuess)
       .filter((b) => b.title.trim().length > 0);
+      
     if (identified.length !== parsed.books.length) {
       logger.warn(
         { dropped: parsed.books.length - identified.length },

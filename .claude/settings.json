@@ -30,7 +30,11 @@
       "PowerShell(node \"C:\\\\Users\\\\it\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-it-Desktop-Projects-shelf-snap-groq-wrapper\\\\c5bb4580-aa3d-4b02-850b-f2c20ef20666\\\\scratchpad\\\\groq-test.js\" \"$PWD\")",
       "Bash(git revert *)",
       "Bash(git remote *)",
-      "WebFetch(domain:developers.google.com)"
+      "WebFetch(domain:developers.google.com)",
+      "Bash(mv inspect.py read_masters.py)",
+      "Bash(python -s -E read_masters.py \"C:/Users/it/Desktop/Marine2415_MasterData.xlsx\")",
+      "Bash(python read_masters.py \"C:/Users/it/Desktop/Marine2415_MasterData.xlsx\")",
+      "Bash(python -c ' *)"
     ]
   }
 }

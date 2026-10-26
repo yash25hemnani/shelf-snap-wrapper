@@ -1,4 +1,4 @@
-import { BookDetails, ScoredBook } from "../types/books.types";
+import { Book, ScoredBook } from "../types/books.types";
 
 /** Lowercase, trim, strip punctuation. */
 function normalize(text: string): string {
@@ -43,14 +43,16 @@ function diceCoefficient(a: string, b: string): number {
 export function scoreAndRank(
   title: string,
   author: string,
-  candidates: BookDetails[],
+  candidates: Book[],
 ): ScoredBook[] {
   const query = normalize(author ? `${title} ${author}` : title);
 
   return candidates
     .map((candidate) => {
       const candidateText = normalize(
-        author ? `${candidate.title} ${candidate.author ?? ""}` : candidate.title,
+        author
+          ? `${candidate.title} ${candidate.authors.join(" ")}`
+          : candidate.title,
       );
       return { ...candidate, score: diceCoefficient(query, candidateText) };
     })
