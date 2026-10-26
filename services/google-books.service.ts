@@ -79,6 +79,7 @@ async function querySingle(query: string, quotaUser?: string): Promise<Book[]> {
   const params = new URLSearchParams({ q: query, key: GOOGLE_BOOKS_API_KEY! });
   if (quotaUser) params.set("quotaUser", quotaUser);
   const url = `${BASE_URL}?${params}`;
+  const start = Date.now();
 
   let response = await fetch(url);
   // 429 (rate limited) and 5xx are usually transient; parallel lookups make
@@ -90,12 +91,27 @@ async function querySingle(query: string, quotaUser?: string): Promise<Book[]> {
   }
 
   if (!response.ok) {
-    // Body is omitted: Google returns a full HTML error page here.
+    // Google's JSON error says why (quota, key restriction, bad request)
+    const body = await response.text().catch(() => "");
+    logger.error(
+      {
+        query,
+        status: response.status,
+        durationMs: Date.now() - start,
+        body: body.slice(0, 300),
+      },
+      "Google Books request failed",
+    );
     throw new Error(`Google Books API error: ${response.status}`);
   }
 
   const data = (await response.json()) as { items?: GoogleBooksItem[] };
-  return (data.items ?? []).map(parseItem);
+  const books = (data.items ?? []).map(parseItem);
+  logger.info(
+    { query, items: books.length, durationMs: Date.now() - start },
+    "Google Books query",
+  );
+  return books;
 }
 
 /** Single Google Books search for user-typed queries (no retry ladder). */
@@ -119,12 +135,19 @@ export async function searchWithRetryLadder(
   const words = query.trim().split(/\s+/).filter(Boolean);
 
   for (let len = words.length; len >= 1; len--) {
-    const results = await querySingle(
-      words.slice(0, len).join(" "),
-      quotaUser,
-    );
-    if (results.length > 0) return results;
+    const step = words.slice(0, len).join(" ");
+    const results = await querySingle(step, quotaUser);
+    if (results.length > 0) {
+      if (len < words.length) {
+        logger.info(
+          { query, matchedOn: step, droppedWords: words.length - len },
+          "Retry ladder found results after dropping words",
+        );
+      }
+      return results;
+    }
   }
 
+  logger.info({ query, steps: words.length }, "Retry ladder found nothing");
   return [];
 }

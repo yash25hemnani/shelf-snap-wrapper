@@ -153,10 +153,14 @@ export function parseIsbn(query: string): string | null {
  */
 export async function searchByIsbn(isbn: string): Promise<Book[]> {
   const cached = cache.get(isbn);
-  if (cached) return cached;
+  if (cached) {
+    logger.info({ isbn, title: cached[0]?.title }, "Open Library cache hit");
+    return cached;
+  }
 
   const url = `${SEARCH_URL}?isbn=${encodeURIComponent(isbn)}&fields=${FIELDS}&limit=1`;
   const headers = { "User-Agent": USER_AGENT };
+  const start = Date.now();
 
   let response = await fetch(url, { headers });
   // 429 and 5xx are usually transient; one delayed retry stays within the
@@ -168,11 +172,37 @@ export async function searchByIsbn(isbn: string): Promise<Book[]> {
   }
 
   if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    logger.error(
+      {
+        isbn,
+        status: response.status,
+        durationMs: Date.now() - start,
+        body: body.slice(0, 300),
+      },
+      "Open Library request failed",
+    );
     throw new Error(`Open Library API error: ${response.status}`);
   }
 
   const data = (await response.json()) as { docs?: OpenLibraryDoc[] };
   const books = (data.docs ?? []).map((doc) => parseDoc(doc, isbn));
+  const [book] = books;
+
+  logger.info(
+    book
+      ? {
+          isbn,
+          durationMs: Date.now() - start,
+          title: book.title,
+          authors: book.authors,
+          hasCover: book.coverUrl !== null,
+          workId: book.workId,
+        }
+      : { isbn, durationMs: Date.now() - start },
+    book ? "Open Library ISBN match" : "Open Library ISBN not found",
+  );
+
   if (books.length > 0) cache.set(isbn, books);
   return books;
 }

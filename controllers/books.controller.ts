@@ -61,11 +61,27 @@ async function lookUpBook(
     return null;
   }
 
-  const [topMatch] = scoreAndRank(title, author, candidates);
+  const ranked = scoreAndRank(title, author, candidates);
+  const [topMatch] = ranked;
   if (!topMatch) {
     logger.info({ query }, "No Google Books match");
     return null;
   }
+
+  // Top few candidates, to see why a book matched or was rejected
+  logger.info(
+    {
+      spine: { title, author },
+      candidates: candidates.length,
+      top: ranked.slice(0, 3).map((b) => ({
+        score: Number(b.score.toFixed(2)),
+        title: b.title,
+        authors: b.authors,
+      })),
+      threshold: STRONG_MATCH_THRESHOLD,
+    },
+    "Scored candidates",
+  );
   if (topMatch.score < STRONG_MATCH_THRESHOLD) {
     logger.info(
       {
@@ -78,6 +94,15 @@ async function lookUpBook(
     );
     return null;
   }
+
+  logger.info(
+    {
+      query,
+      matchTitle: topMatch.title,
+      score: Number(topMatch.score.toFixed(2)),
+    },
+    "Matched",
+  );
   return topMatch;
 }
 
@@ -129,6 +154,7 @@ export async function searchBookByIsbn(req: Request, res: Response) {
   const isbn = parseIsbn(raw);
 
   if (!isbn) {
+    logger.info({ raw }, "isbn-search rejected invalid ISBN");
     return res
       .status(400)
       .json({ error: "isbn must be a 10- or 13-digit ISBN" });
@@ -227,6 +253,14 @@ export async function identifyBooks(req: Request, res: Response) {
       .filter(isValidSpineGuess)
       .filter((b) => b.title.trim().length > 0);
       
+    logger.info(
+      {
+        count: identified.length,
+        spines: identified.map((b) => `${b.title} | ${b.author}`),
+      },
+      "Groq identified spines",
+    );
+
     if (identified.length !== parsed.books.length) {
       logger.warn(
         { dropped: parsed.books.length - identified.length },
@@ -248,7 +282,11 @@ export async function identifyBooks(req: Request, res: Response) {
     );
 
     logger.info(
-      { identifiedCount: identified.length, bookCount: books.length },
+      {
+        identifiedCount: identified.length,
+        bookCount: books.length,
+        books: books.map((b) => b.title),
+      },
       "identifyBooks succeeded",
     );
     res.json({ books });
