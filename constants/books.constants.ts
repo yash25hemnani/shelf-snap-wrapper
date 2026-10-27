@@ -1,6 +1,9 @@
 // Vision model: reads spines directly from the photo, with OCR blocks as hints.
 export const MODEL_NAME = 'qwen/qwen3.8-27b';
 
+// Fallback vision model, used when Groq's rate limit is hit.
+export const GEMINI_MODEL_NAME = 'gemini-3.8-flash';
+
 export const MAX_BLOCKS = 200;
 
 // Bounds for the user-typed search-books query.

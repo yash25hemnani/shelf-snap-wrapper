@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import Groq from "groq-sdk";
 import {
-  MODEL_NAME,
-  SYSTEM_PROMPT,
   MAX_BLOCKS,
   MIN_QUERY_LENGTH,
   MAX_QUERY_LENGTH,
@@ -18,20 +15,15 @@ import {
 } from "../services/google-books.service";
 import { parseIsbn, searchByIsbn } from "../services/open-library.service";
 import { scoreAndRank } from "../services/match-scoring.service";
+import {
+  identifySpines,
+  ModelsUnavailableError,
+} from "../services/vision.service";
 import { ScoredBook, SpineGuess } from "../types/books.types";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-
-if (!GROQ_API_KEY) {
-  logger.error("Missing GROQ_API_KEY in .env — refusing to start.");
-  process.exit(1);
-}
-
-const groq = new Groq({ apiKey: GROQ_API_KEY });
-
 /**
- * True if [value] is an object with a string title and author. Groq's JSON
- * mode guarantees valid JSON but not this shape, so each entry is checked.
+ * True if [value] is an object with a string title and author. The models'
+ * JSON mode guarantees valid JSON but not this shape, so each entry is checked.
  */
 function isValidSpineGuess(value: unknown): value is SpineGuess {
   return (
@@ -169,7 +161,7 @@ export async function searchBookByIsbn(req: Request, res: Response) {
   }
 }
 
-// Identify books from an image using groq
+// Identify books from an image using Groq, or Gemini if Groq is rate limited
 export async function identifyBooks(req: Request, res: Response) {
   const { image, imageMimeType, imageWidth, imageHeight } = req.body ?? {};
   const blocks = req.body?.blocks ?? [];
@@ -201,52 +193,35 @@ export async function identifyBooks(req: Request, res: Response) {
   );
 
   try {
-    const groqStart = Date.now();
-    const completion = await groq.chat.completions.create({
-      model: MODEL_NAME,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: buildPrompt({ imageWidth, imageHeight, blocks }),
-            },
-            {
-              type: "image_url",
-              image_url: { url: `data:${imageMimeType};base64,${image}` },
-            },
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
+    const modelStart = Date.now();
+    const { provider, responseText } = await identifySpines({
+      prompt: buildPrompt({ imageWidth, imageHeight, blocks }),
+      image,
+      imageMimeType,
     });
 
-    const responseText = completion.choices[0]?.message?.content ?? "";
-
     logger.info(
-      { durationMs: Date.now() - groqStart, responseText },
-      "Groq call completed",
+      { provider, durationMs: Date.now() - modelStart, responseText },
+      "Model call completed",
     );
 
-    // JSON object mode guarantees syntactically valid JSON but not that it
+    // JSON mode guarantees syntactically valid JSON but not that it
     // matches RESPONSE_SCHEMA, so we still guard the parse and the shape.
     let parsed: { books?: unknown };
 
     try {
       parsed = JSON.parse(responseText);
     } catch (err) {
-      logger.error({ responseText }, "Failed to parse Groq response as JSON");
-      return res.status(502).json({ error: "Groq returned malformed JSON" });
+      logger.error({ provider, responseText }, "Failed to parse model response as JSON");
+      return res.status(502).json({ error: "Model returned malformed JSON" });
     }
 
     // Check if returned response has books array
     if (!Array.isArray(parsed?.books)) {
-      logger.error({ parsed }, "Groq response had no books array");
+      logger.error({ provider, parsed }, "Model response had no books array");
       return res
         .status(502)
-        .json({ error: "Groq response had no books array" });
+        .json({ error: "Model response had no books array" });
     }
 
     const identified: SpineGuess[] = parsed.books
@@ -258,13 +233,13 @@ export async function identifyBooks(req: Request, res: Response) {
         count: identified.length,
         spines: identified.map((b) => `${b.title} | ${b.author}`),
       },
-      "Groq identified spines",
+      "Model identified spines",
     );
 
     if (identified.length !== parsed.books.length) {
       logger.warn(
         { dropped: parsed.books.length - identified.length },
-        "Dropped malformed book entries from Groq response",
+        "Dropped malformed book entries from model response",
       );
     }
 
@@ -291,8 +266,12 @@ export async function identifyBooks(req: Request, res: Response) {
     );
     res.json({ books });
   } catch (err) {
-    logger.error({ err }, "Groq call failed");
-    res.status(502).json({ error: "Failed to reach Groq API" });
+    if (err instanceof ModelsUnavailableError) {
+      logger.error("Groq and Gemini both unavailable");
+      return res.status(503).json({ error: "Models not available" });
+    }
+    logger.error({ err }, "Identify books failed");
+    res.status(502).json({ error: "Failed to identify books" });
   }
 }
 
