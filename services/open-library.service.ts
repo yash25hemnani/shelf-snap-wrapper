@@ -18,6 +18,7 @@ interface OpenLibraryDoc {
   subtitle?: string;
   author_name?: string[];
   cover_i?: number;
+  first_publish_year?: number;
   number_of_pages_median?: number;
   subject?: string[];
   editions?: { docs?: OpenLibraryEdition[] };
@@ -26,6 +27,7 @@ interface OpenLibraryDoc {
 const SEARCH_URL = "https://openlibrary.org/search.json";
 const COVER_URL = "https://covers.openlibrary.org/b/id";
 const RETRY_DELAY_MS = 1000;
+const SEARCH_FIELDS = "key,title,author_name,first_publish_year,cover_i";
 // Open Library subjects run to dozens of tags per work; Google gives a few.
 const MAX_CATEGORIES = 5;
 // Work-level fields (publisher, language, ...) mix every edition, so edition
@@ -87,6 +89,7 @@ const OPENLIBRARY_CONTACT = process.env.OPENLIBRARY_CONTACT;
 const USER_AGENT = OPENLIBRARY_CONTACT
   ? `ShelfSnap (${OPENLIBRARY_CONTACT})`
   : "ShelfSnap";
+const SEARCH_DELAY_MS = OPENLIBRARY_CONTACT ? 334 : RETRY_DELAY_MS;
 
 if (!OPENLIBRARY_CONTACT) {
   logger.warn(
@@ -145,6 +148,151 @@ export function parseIsbn(query: string): string | null {
     .replace(/[-\s]/g, "")
     .toUpperCase();
   return /^(\d{9}[\dX]|\d{13})$/.test(isbn) ? isbn : null;
+}
+
+export interface OpenLibrarySearchOptions {
+  title?: string;
+  author?: string;
+  genres?: string[];
+  page: number;
+  limit: number;
+}
+
+export interface OpenLibrarySearchResult {
+  books: Book[];
+  total: number;
+}
+
+function parseSearchDoc(doc: OpenLibraryDoc): Book {
+  const coverId = doc.cover_i;
+  return {
+    googleBooksId: null,
+    workId: doc.key?.replace(/^\/works\//, "") ?? null,
+    isbn: null,
+    title: doc.title ?? "Unknown Title",
+    subtitle: null,
+    authors: doc.author_name ?? [],
+    description: null,
+    categories: [],
+    publisher: null,
+    publishedDate: doc.first_publish_year
+      ? String(doc.first_publish_year)
+      : null,
+    pageCount: null,
+    language: null,
+    coverUrl: coverId ? `${COVER_URL}/${coverId}-M.jpg` : null,
+    source: "openlibrary",
+  };
+}
+
+function normalizedName(value: string): string {
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Searches Open Library with structured fields. Multiple genres are queried
+ * independently and merged by work key.
+ */
+export async function searchBooks(
+  options: OpenLibrarySearchOptions,
+): Promise<OpenLibrarySearchResult> {
+  const genres = options.genres?.length ? options.genres : [undefined];
+  const headers = { "User-Agent": USER_AGENT };
+  const start = Date.now();
+  const results: { docs?: OpenLibraryDoc[]; numFound?: number }[] = [];
+  for (const [index, genre] of genres.entries()) {
+    if (index > 0) {
+      await new Promise((resolve) => setTimeout(resolve, SEARCH_DELAY_MS));
+    }
+
+    const params = new URLSearchParams({
+      fields: SEARCH_FIELDS,
+      limit: String(options.limit),
+      page: String(options.page),
+    });
+    if (options.title) params.set("title", options.title);
+    if (options.author) params.set("author", options.author);
+    if (genre) params.set("subject", genre);
+    if (
+      (!options.title && options.author && !genre) ||
+      (genre && !options.author)
+    ) {
+      params.set("sort", "editions");
+    }
+
+    const url = `${SEARCH_URL}?${params}`;
+    let response = await fetch(url, { headers });
+    if (response.status === 429 || response.status >= 500) {
+      logger.warn(
+        {
+          title: options.title,
+          author: options.author,
+          genre,
+          status: response.status,
+        },
+        "Open Library search retry",
+      );
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      response = await fetch(url, { headers });
+    }
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      logger.error(
+        {
+          title: options.title,
+          author: options.author,
+          genre,
+          status: response.status,
+          durationMs: Date.now() - start,
+          body: body.slice(0, 300),
+        },
+        "Open Library search failed",
+      );
+      throw new Error(`Open Library API error: ${response.status}`);
+    }
+
+    results.push((await response.json()) as {
+      docs?: OpenLibraryDoc[];
+      numFound?: number;
+    });
+  }
+
+  const author = options.author ? normalizedName(options.author) : null;
+  const byWork = new Map<string, Book>();
+  let total = 0;
+  for (const result of results) {
+    total += result.numFound ?? 0;
+    for (const doc of result.docs ?? []) {
+      if (
+        author &&
+        !(doc.author_name ?? []).some((name) =>
+          normalizedName(name).includes(author),
+        )
+      ) {
+        continue;
+      }
+      const book = parseSearchDoc(doc);
+      const key = book.workId ?? `${book.title}:${book.authors.join(",")}`;
+      byWork.set(key, book);
+    }
+  }
+
+  const books = [...byWork.values()].slice(0, options.limit);
+  logger.info(
+    {
+      title: options.title,
+      author: options.author,
+      genres: options.genres,
+      page: options.page,
+      limit: options.limit,
+      items: books.length,
+      total,
+      durationMs: Date.now() - start,
+    },
+    "Open Library search",
+  );
+  return { books, total };
 }
 
 /**

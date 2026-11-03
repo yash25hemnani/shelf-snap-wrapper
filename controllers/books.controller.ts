@@ -9,11 +9,12 @@ import {
 } from "../constants/books.constants";
 import { logger } from "../utils/logger";
 import { buildPrompt } from "../utils/prompts";
+import { searchWithRetryLadder } from "../services/google-books.service";
 import {
-  searchBooksByQuery,
-  searchWithRetryLadder,
-} from "../services/google-books.service";
-import { parseIsbn, searchByIsbn } from "../services/open-library.service";
+  parseIsbn,
+  searchBooks as searchOpenLibrary,
+  searchByIsbn,
+} from "../services/open-library.service";
 import { scoreAndRank } from "../services/match-scoring.service";
 import {
   identifySpines,
@@ -110,33 +111,80 @@ function dedupeByTitle(books: ScoredBook[]): ScoredBook[] {
 }
 
 export async function searchBooks(req: Request, res: Response) {
-  const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+  const title =
+    typeof req.query.title === "string" ? req.query.title.trim() : undefined;
+  const author =
+    typeof req.query.author === "string" ? req.query.author.trim() : undefined;
+  const genreValues = Array.isArray(req.query.genre)
+    ? req.query.genre.filter(
+        (value): value is string => typeof value === "string",
+      )
+    : typeof req.query.genre === "string"
+      ? [req.query.genre]
+      : [];
+  const genres = genreValues.flatMap((value) =>
+    value
+      .split(",")
+      .map((term) => term.trim())
+      .filter(Boolean),
+  );
+  const uniqueGenres = [...new Set(genres)];
+  const pageValue = typeof req.query.page === "string" ? req.query.page : "1";
+  const limitValue =
+    typeof req.query.limit === "string" ? req.query.limit : "10";
+  const page = /^\d+$/.test(pageValue) ? Number(pageValue) : NaN;
+  const limit = /^\d+$/.test(limitValue) ? Number(limitValue) : NaN;
 
-  if (q.length < MIN_QUERY_LENGTH) {
-    return res
-      .status(400)
-      .json({ error: `q must be at least ${MIN_QUERY_LENGTH} characters` });
+  if (!title && !author && uniqueGenres.length === 0) {
+    return res.status(400).json({
+      error: "Provide at least one of title, author, or genre",
+    });
   }
-  if (q.length > MAX_QUERY_LENGTH) {
+  const terms = [title, author, ...uniqueGenres].filter(
+    (term): term is string => term !== undefined && term.length > 0,
+  );
+  if (
+    terms.some(
+      (term) =>
+        term.length < MIN_QUERY_LENGTH || term.length > MAX_QUERY_LENGTH,
+    )
+  ) {
+    return res.status(400).json({
+      error: `Search terms must be between ${MIN_QUERY_LENGTH} and ${MAX_QUERY_LENGTH} characters`,
+    });
+  }
+  if (!Number.isSafeInteger(page) || page < 1) {
+    return res.status(400).json({ error: "page must be a positive integer" });
+  }
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
     return res
       .status(400)
-      .json({ error: `q must be at most ${MAX_QUERY_LENGTH} characters` });
+      .json({ error: "limit must be an integer between 1 and 100" });
   }
 
   try {
-    const books = await searchBooksByQuery(q, req.user?.uid);
-    res.json({ books });
+    const result = await searchOpenLibrary({
+      title,
+      author,
+      genres: uniqueGenres,
+      page,
+      limit,
+    });
+    res.json({ books: result.books, page, limit, total: result.total });
   } catch (err) {
-    logger.error({ err, q }, "search-books failed");
+    logger.error(
+      { err, title, author, genres: uniqueGenres },
+      "search-books failed",
+    );
 
-    // querySingle throws "Google Books API error: <status>"
+    // Open Library search failures include the HTTP status in the message.
     const throttled = err instanceof Error && err.message.endsWith("429");
     if (throttled) {
       return res
         .status(503)
         .json({ error: "Search is busy, try again shortly" });
     }
-    res.status(502).json({ error: "Failed to reach Google Books" });
+    res.status(502).json({ error: "Failed to reach Open Library" });
   }
 }
 

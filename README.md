@@ -63,6 +63,44 @@ Each block must have a `text` field; any other fields (e.g. bounding box coordin
 
 On failure: `{ "error": "..." }` with a `400`, `401`, or `502` status.
 
+### `GET /search-books`
+
+Searches Open Library using one or more structured parameters. Provide at least
+one of `title`, `author`, or `genre`; `title` and `author` can be combined.
+Genre terms can be repeated or comma-separated and their results are merged.
+
+| Parameter | Description |
+| --------- | ----------- |
+| `title` | Match title words. |
+| `author` | Match author; returned results are filtered for the full author name. |
+| `genre` | Open Library subject term; supports repeated or comma-separated terms. |
+| `page` | 1-based page number (default `1`). |
+| `limit` | Results per page, from `1` to `100` (default `10`). |
+
+Examples:
+
+```text
+GET /search-books?title=the%20hobbit
+GET /search-books?author=toni%20morrison
+GET /search-books?title=dune&author=frank%20herbert
+GET /search-books?genre=science%20fiction,horror&author=stephen%20king
+```
+
+The response includes pagination metadata:
+
+```json
+{
+  "books": [],
+  "page": 1,
+  "limit": 10,
+  "total": 123
+}
+```
+
+`total` comes from Open Library's matching-document counts. Because author
+searches are filtered client-side and genre terms can overlap, it may differ
+from the number of distinct books returned.
+
 ## Notes
 
 - Every route requires a valid Firebase ID token (see [middleware/auth.middleware.ts](middleware/auth.middleware.ts)). Sign in with the Firebase client SDK and send the resulting ID token as `Authorization: Bearer <token>`; the server verifies it against your Firebase project via the Admin SDK (configured in [config/firebase.ts](config/firebase.ts)).
