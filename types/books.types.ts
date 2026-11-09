@@ -61,3 +61,18 @@ export interface DiscoverSpineGuess extends SpineGuess {
 export interface DiscoveredBook extends ScoredBook {
   genres: string[];
 }
+
+/** A book's English Wikipedia page: intro text plus infobox facts. */
+export interface WikiBook {
+  title: string;
+  url: string;
+  summary: string | null;
+  thumbnail: string | null;
+  publishedYear: string | null;
+  pageCount: number | null;
+  // Wikipedia's own genre names, not the app's Genre enum
+  genres: string[];
+  series: string | null;
+  country: string | null;
+  language: string | null;
+}

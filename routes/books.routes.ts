@@ -6,6 +6,7 @@ import {
   searchBooks,
 } from '../controllers/books.controller';
 import { discoverBooks } from '../controllers/discover.controller';
+import { getWikipediaBook } from '../controllers/wikipedia.controller';
 import { verifyFirebaseToken } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -17,5 +18,6 @@ router.post('/identify-books', identifyBooks);
 router.post('/discover', discoverBooks);
 router.get('/search-books', searchBooks);
 router.get('/isbn-search', searchBookByIsbn);
+router.get('/wikipedia-book', getWikipediaBook);
 
 export default router;

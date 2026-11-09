@@ -101,6 +101,37 @@ The response includes pagination metadata:
 searches are filtered client-side and genre terms can overlap, it may differ
 from the number of distinct books returned.
 
+### `GET /wikipedia-book`
+
+Finds a book's English Wikipedia page from `title` and `author` (both
+required). It tries `Title (novel)`, `Title (book)` and `Title` in one request,
+then falls back to a search of pages with a book infobox. A page only counts if
+its infobox author contains the author's last name.
+
+```text
+GET /wikipedia-book?title=dune&author=frank%20herbert
+```
+
+```json
+{
+  "book": {
+    "title": "Dune (novel)",
+    "url": "https://en.wikipedia.org/wiki/Dune_(novel)",
+    "summary": "Dune is a 1965 epic science fiction novel by ...",
+    "thumbnail": "https://upload.wikimedia.org/...",
+    "publishedYear": "1965",
+    "pageCount": 412,
+    "genres": ["Science fiction", "Philosophical fiction"],
+    "series": "Dune series",
+    "country": null,
+    "language": "English"
+  }
+}
+```
+
+`book` is `null` when no page matches. The User-Agent uses `WIKI_CONTACT`, or
+`OPENLIBRARY_CONTACT` if that isn't set.
+
 ## Notes
 
 - Every route requires a valid Firebase ID token (see [middleware/auth.middleware.ts](middleware/auth.middleware.ts)). Sign in with the Firebase client SDK and send the resulting ID token as `Authorization: Bearer <token>`; the server verifies it against your Firebase project via the Admin SDK (configured in [config/firebase.ts](config/firebase.ts)).
