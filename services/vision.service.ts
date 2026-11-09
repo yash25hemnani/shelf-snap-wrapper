@@ -10,6 +10,8 @@ export interface VisionInput {
   prompt: string;
   image: string; // base64, no data: prefix
   imageMimeType: string;
+  // Defaults to SYSTEM_PROMPT (the /identify-books schema)
+  systemPrompt?: string;
 }
 
 export interface VisionResult {
@@ -19,6 +21,12 @@ export interface VisionResult {
 
 interface GeminiResponse {
   candidates?: { content?: { parts?: { text?: string }[] } }[];
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    thoughtsTokenCount?: number;
+    totalTokenCount?: number;
+  };
 }
 
 /** Thrown when Groq is rate limited and Gemini can't take over. */
@@ -59,11 +67,16 @@ function shouldFallBack(err: unknown) {
   );
 }
 
-async function callGroq({ prompt, image, imageMimeType }: VisionInput) {
+async function callGroq({
+  prompt,
+  image,
+  imageMimeType,
+  systemPrompt = SYSTEM_PROMPT,
+}: VisionInput) {
   const completion = await groq.chat.completions.create({
     model: MODEL_NAME,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       {
         role: "user",
         content: [
@@ -78,10 +91,27 @@ async function callGroq({ prompt, image, imageMimeType }: VisionInput) {
     response_format: { type: "json_object" },
   });
 
+  // Groq's limit is per-minute tokens, so log what each scan costs
+  const usage = completion.usage;
+  logger.info(
+    {
+      provider: "groq",
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+    },
+    "Model token usage",
+  );
+
   return completion.choices[0]?.message?.content ?? "";
 }
 
-async function callGemini({ prompt, image, imageMimeType }: VisionInput) {
+async function callGemini({
+  prompt,
+  image,
+  imageMimeType,
+  systemPrompt = SYSTEM_PROMPT,
+}: VisionInput) {
   const response = await fetch(GEMINI_URL, {
     method: "POST",
     signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
@@ -90,7 +120,7 @@ async function callGemini({ prompt, image, imageMimeType }: VisionInput) {
       "x-goog-api-key": GEMINI_API_KEY ?? "",
     },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [
         {
           role: "user",
@@ -114,6 +144,18 @@ async function callGemini({ prompt, image, imageMimeType }: VisionInput) {
   }
 
   const data = (await response.json()) as GeminiResponse;
+  const usage = data.usageMetadata;
+  logger.info(
+    {
+      provider: "gemini",
+      promptTokens: usage?.promptTokenCount,
+      completionTokens: usage?.candidatesTokenCount,
+      thoughtsTokens: usage?.thoughtsTokenCount,
+      totalTokens: usage?.totalTokenCount,
+    },
+    "Model token usage",
+  );
+
   const parts = data.candidates?.[0]?.content?.parts ?? [];
   return parts.map((p) => p.text ?? "").join("");
 }

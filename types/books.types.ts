@@ -51,3 +51,13 @@ export interface SpineGuess {
   title: string;
   author: string;
 }
+
+/** A /discover spine guess: also carries the model's genre labels. */
+export interface DiscoverSpineGuess extends SpineGuess {
+  genres: string[];
+}
+
+/** A /discover result: a scored listing plus app Genre enum names (0–2). */
+export interface DiscoveredBook extends ScoredBook {
+  genres: string[];
+}
