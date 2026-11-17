@@ -1,0 +1,1055 @@
+<!DOCTYPE html><html lang="en" style="width: 1280px; height: 100%; min-height: 100vh; overflow-x: hidden;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&amp;family=Google+Sans+Text:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Google Sans Text', 'Google Sans', -apple-system, sans-serif; background-color: #fafbfb; color: #1B2B22; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2F6B4F",
+            "primary-dark": "#1F4A36",
+            "primary-soft": "#E3EFE8",
+            "accent": "#3A6EA5",
+            "accent-soft": "#E6EEF7",
+            "secondary": "#A8842F",
+            "secondary-soft": "#FBF1DE",
+            "warning": "#C98A1B",
+            "warning-soft": "#FBF1DE",
+            "error": "#D64545",
+            "error-soft": "#FBEAEA",
+            "text-primary": "#1B2B22",
+            "text-secondary": "#5F6F66",
+            "text-hint": "#9AA8A0",
+            "border-subtle": "#E2E8E4",
+            "surface-muted": "#F4F7F5",
+            "surface-container-high": "#EBF0ED"
+          },
+          fontFamily: {
+            sans: ['"Google Sans Text"', '"Google Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafbfb] antialiased text-text-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white z-50 flex flex-col justify-between border-r border-border-subtle">
+<div class="flex flex-col">
+<!-- Brand / Header -->
+<div class="p-5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[19px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[15px] text-text-primary tracking-tight leading-tight">Admin Console</span>
+<span class="text-[11px] text-text-hint font-medium">Platform Governance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">v1.4</span>
+</div>
+<!-- Navigation -->
+<nav class="p-3.5 flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Overview</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assignment</span>
+<span>Audit Log</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Telemetry &amp; LLM</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">bolt</span>
+<span>Token Tracking</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">warning</span>
+<span>Error Log</span>
+</div>
+<span class="px-2 py-0.2 rounded-full bg-error-soft text-error font-medium text-[11px]">3 active</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Governance</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold text-[13px] bg-primary-soft text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+<span>Content &amp; Libraries</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>Remote Config</span>
+</a>
+</div>
+</nav>
+</div>
+<!-- User / Session Footer -->
+<div class="p-3.5 border-t border-border-subtle bg-white">
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-muted border border-border-subtle">
+<div class="flex items-center gap-2.5">
+<img alt="Alex Chen" class="w-8 h-8 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+<div class="flex flex-col leading-tight">
+<span class="font-semibold text-[13px] text-text-primary">Alex Chen</span>
+<span class="text-[11px] text-text-secondary">Superadmin</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-error transition-colors rounded-lg" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Shell Area -->
+<div class="pl-64 min-h-screen flex flex-col">
+<!-- Topbar -->
+<header class="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-sm border-b border-border-subtle flex items-center justify-between px-8">
+<div class="flex items-center gap-3">
+<span class="text-[13px] font-medium text-text-hint">Governance</span>
+<span class="text-text-hint text-[12px]">/</span>
+<span class="text-[13px] font-semibold text-text-primary">User Directory</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-muted text-text-secondary text-[12px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Directory Sync Active</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle text-text-primary text-[12px] font-medium hover:bg-surface-muted transition-colors">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">sync</span>
+<span>Sync</span>
+</button>
+<img alt="Alex Chen" class="w-7 h-7 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 px-8 py-6 max-w-7xl w-full mx-auto"><div class="flex flex-col w-full">
+<!-- Toast Feedback Overlay -->
+<div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-full bg-on-surface text-surface shadow-xl translate-y-20 opacity-0 pointer-events-none transition-all duration-300" id="toast-banner">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed">info</span>
+<span class="font-label-md text-label-md" id="toast-msg">Export initiated. Usage CSV generated.</span>
+<button class="p-1 rounded-full hover:bg-surface-tint/20 text-surface" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Page Header & Global Telemetry Scope Bar -->
+<div class="flex flex-col gap-6 mb-8">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-text-hint uppercase tracking-wider">
+<span>Telemetry &amp; LLM</span>
+<span class="text-text-hint">/</span>
+<span class="text-primary font-semibold">Token Tracking</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px]">Groq Fast-LPU</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-text-primary tracking-tight">LLM Telemetry &amp; Token Analytics</h1>
+<p class="font-body-md text-body-md text-text-secondary max-w-3xl">
+          Real-time diagnostics of Groq API inference budgets, high-volume library OCR vision parsing, token drift, and hardware acceleration efficiency.
+        </p>
+</div>
+<!-- Controls & Filter Toolbar -->
+<div class="flex flex-wrap items-center gap-2.5">
+<!-- Date Range Filter Pill -->
+<div class="relative flex items-center bg-surface-container-lowest px-3.5 py-2.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-text-secondary mr-2">calendar_today</span>
+<select class="bg-transparent border-0 p-0 pr-6 font-label-md text-label-md text-text-primary focus:ring-0 cursor-pointer" id="timeRangeSelect" onchange="updateTimeRange(this.value)">
+<option value="30d">Last 30 Days (Oct 01 - Oct 31)</option>
+<option value="14d">Last 14 Days</option>
+<option value="7d">Last 7 Days</option>
+<option value="24h">Last 24 Hours (Realtime)</option>
+</select>
+</div>
+<!-- Model Selector Pill -->
+<div class="relative flex items-center bg-surface-container-lowest px-3.5 py-2.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-text-secondary mr-2">hub</span>
+<select class="bg-transparent border-0 p-0 pr-6 font-label-md text-label-md text-text-primary focus:ring-0 cursor-pointer" id="modelSelect" onchange="filterModel(this.value)">
+<option value="all">All Models (Llama 3 70B, Mixtral 8x7B)</option>
+<option value="llama3-70b">Llama 3 70B (Vision / OCR)</option>
+<option value="mixtral">Mixtral 8x7B Instruct</option>
+<option value="embedding">Embedding v2 High-Res</option>
+</select>
+</div>
+<!-- Download Usage Report CTA -->
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-dark text-on-primary font-label-lg text-label-lg transition-all shadow-sm" onclick="downloadReport()">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Download Usage Report</span>
+</button>
+</div>
+</div>
+<!-- Cluster Status Banner (Micro Ambient State) -->
+<div class="flex items-center justify-between px-4 py-2.5 rounded-xl bg-surface-container-high/40">
+<div class="flex items-center gap-3">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="font-label-md text-label-md text-text-primary">Groq Cloud Node Pool: <strong class="font-semibold text-primary">groq-us-east-cluster-04</strong> healthy</span>
+<span class="text-text-hint">•</span>
+<span class="font-label-sm text-label-sm text-text-secondary">Token Rate Limit: <strong>12,000 TPM</strong> (Current: 3,420 TPM peak)</span>
+</div>
+<div class="flex items-center gap-4 text-text-hint font-label-sm text-label-sm">
+<span>Sampling interval: 15s</span>
+<button class="text-text-secondary hover:text-primary transition-colors flex items-center gap-1" onclick="triggerToast('Synchronized with Groq telemetry mesh');">
+<span class="material-symbols-outlined text-[14px]">refresh</span> Refresh
+        </button>
+</div>
+</div>
+</div>
+<!-- KPI Stat Block: 4 Bento Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+<!-- Metric 1: Monthly Token Burn -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">Monthly Token Burn</span>
+<div class="w-8 h-8 rounded-full bg-primary-soft text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-text-primary tracking-tight" id="kpi-tokens">148.2M</span>
+<span class="font-label-sm text-label-sm text-text-hint font-mono">tokens</span>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 bg-surface-muted/50 -mx-5 -mb-5 px-5 py-2.5">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-semibold">+8.4%</span>
+<span class="text-text-hint font-normal">MoM</span>
+</div>
+<span class="font-label-sm text-label-sm font-mono text-text-secondary">$38.52 est. cost</span>
+</div>
+</div>
+</div>
+<!-- Metric 2: Prompt vs Completion Ratio -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">Prompt / Completion Ratio</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-xl text-headline-xl text-text-primary tracking-tight">68% <span class="font-body-md text-body-md text-text-hint font-normal">/</span> 32%</span>
+<span class="font-label-sm text-label-sm text-primary font-mono font-medium">Vision-heavy</span>
+</div>
+<!-- Dual progress gauge bar -->
+<div class="w-full bg-surface-container-high rounded-full h-2 flex overflow-hidden">
+<div class="bg-primary h-2" style="width: 68%" title="Prompt: 68%"></div>
+<div class="bg-secondary-container h-2" style="width: 32%" title="Completion: 32%"></div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-2 bg-surface-muted/50 -mx-5 -mb-5 px-5 py-2.5">
+<span class="font-label-sm text-label-sm text-text-secondary">Avg Prompt Payload:</span>
+<span class="font-label-sm text-label-sm font-mono font-semibold text-text-primary">1,120 tok / scan</span>
+</div>
+</div>
+</div>
+<!-- Metric 3: Avg OCR / Book Scan Latency -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">Avg Scan / OCR Latency</span>
+<div class="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">speed</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-text-primary tracking-tight">412<span class="text-title-lg font-normal text-text-secondary">ms</span></span>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Sub-half sec</span>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 bg-surface-muted/50 -mx-5 -mb-5 px-5 py-2.5">
+<span class="font-label-sm text-label-sm text-text-hint font-mono">p99: 980ms</span>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-text-secondary">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>Groq Cloud Edge</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Metric 4: API Error Rate & Throttling -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">API Health &amp; Rate Limits</span>
+<div class="w-8 h-8 rounded-full bg-warning-soft text-warning flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">format_image_left</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-text-primary tracking-tight">0.04%</span>
+<span class="px-2 py-0.5 rounded-full bg-warning-soft text-warning font-label-sm text-label-sm font-medium">3 bursts flagged</span>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 bg-surface-muted/50 -mx-5 -mb-5 px-5 py-2.5">
+<span class="font-label-sm text-label-sm text-text-secondary">30d Throttle Count:</span>
+<span class="font-label-sm text-label-sm font-mono font-bold text-warning">3 rate spikes</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Deep Telemetry Section: Visual Stacked Bar Chart & Efficiency Radial Gauge -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<!-- Primary Chart (8 Cols) -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h2 class="font-title-lg text-title-lg text-text-primary tracking-tight">Daily Token Volume &amp; Model Breakdown</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-text-secondary font-mono text-[10px]">October 2024</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-hint">Stacked daily token allocations across vision extraction, structured cataloging, and semantic vector embeddings</span>
+</div>
+<!-- Legend Chips -->
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-text-secondary">
+<span class="w-3 h-3 rounded-sm bg-primary"></span>
+<span>Llama 3 70B (Vision)</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-text-secondary">
+<span class="w-3 h-3 rounded-sm bg-secondary-container"></span>
+<span>Mixtral 8x7B</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-text-secondary">
+<span class="w-3 h-3 rounded-sm bg-accent"></span>
+<span>Embeddings</span>
+</div>
+</div>
+</div>
+<!-- High-Fidelity SVG Stacked Chart -->
+<div class="w-full h-72 flex flex-col justify-end relative">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+</div>
+<!-- SVG Visual Graphic Bars with hover inspection -->
+<svg class="w-full h-64 overflow-visible" preserveAspectRatio="none" viewBox="0 0 680 200">
+<defs>
+<linearGradient id="llamaGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#125238"></stop>
+<stop offset="100%" stop-color="#1F4A36"></stop>
+</linearGradient>
+</defs>
+<!-- Day 1 to 14 stacked columns -->
+<!-- Day 1 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="45" rx="3" width="24" x="20" y="145"></rect>
+<rect fill="#fdd274" height="52" rx="3" width="24" x="20" y="90"></rect>
+<rect fill="url(#llamaGrad)" height="57" rx="3" width="24" x="20" y="30"></rect>
+</g>
+<!-- Day 2 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="50" rx="3" width="24" x="65" y="140"></rect>
+<rect fill="#fdd274" height="52" rx="3" width="24" x="65" y="85"></rect>
+<rect fill="url(#llamaGrad)" height="57" rx="3" width="24" x="65" y="25"></rect>
+</g>
+<!-- Day 3 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="40" rx="3" width="24" x="110" y="150"></rect>
+<rect fill="#fdd274" height="42" rx="3" width="24" x="110" y="105"></rect>
+<rect fill="url(#llamaGrad)" height="57" rx="3" width="24" x="110" y="45"></rect>
+</g>
+<!-- Day 4 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="35" rx="3" width="24" x="155" y="155"></rect>
+<rect fill="#fdd274" height="37" rx="3" width="24" x="155" y="115"></rect>
+<rect fill="url(#llamaGrad)" height="57" rx="3" width="24" x="155" y="55"></rect>
+</g>
+<!-- Day 5 (Burst batch) -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="60" rx="3" width="24" x="200" y="130"></rect>
+<rect fill="#fdd274" height="57" rx="3" width="24" x="200" y="70"></rect>
+<rect fill="url(#llamaGrad)" height="57" rx="3" width="24" x="200" y="10"></rect>
+</g>
+<!-- Day 6 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="45" rx="3" width="24" x="245" y="145"></rect>
+<rect fill="#fdd274" height="47" rx="3" width="24" x="245" y="95"></rect>
+<rect fill="url(#llamaGrad)" height="54" rx="3" width="24" x="245" y="38"></rect>
+</g>
+<!-- Day 7 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="50" rx="3" width="24" x="290" y="140"></rect>
+<rect fill="#fdd274" height="47" rx="3" width="24" x="290" y="90"></rect>
+<rect fill="url(#llamaGrad)" height="55" rx="3" width="24" x="290" y="32"></rect>
+</g>
+<!-- Day 8 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="40" rx="3" width="24" x="335" y="150"></rect>
+<rect fill="#fdd274" height="47" rx="3" width="24" x="335" y="100"></rect>
+<rect fill="url(#llamaGrad)" height="55" rx="3" width="24" x="335" y="42"></rect>
+</g>
+<!-- Day 9 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="52" rx="3" width="24" x="380" y="138"></rect>
+<rect fill="#fdd274" height="53" rx="3" width="24" x="380" y="82"></rect>
+<rect fill="url(#llamaGrad)" height="55" rx="3" width="24" x="380" y="24"></rect>
+</g>
+<!-- Day 10 (Peak cataloging) -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="65" rx="3" width="24" x="425" y="125"></rect>
+<rect fill="#fdd274" height="57" rx="3" width="24" x="425" y="65"></rect>
+<rect fill="url(#llamaGrad)" height="54" rx="3" width="24" x="425" y="8"></rect>
+</g>
+<!-- Day 11 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="48" rx="3" width="24" x="470" y="142"></rect>
+<rect fill="#fdd274" height="51" rx="3" width="24" x="470" y="88"></rect>
+<rect fill="url(#llamaGrad)" height="55" rx="3" width="24" x="470" y="30"></rect>
+</g>
+<!-- Day 12 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="55" rx="3" width="24" x="515" y="135"></rect>
+<rect fill="#fdd274" height="54" rx="3" width="24" x="515" y="78"></rect>
+<rect fill="url(#llamaGrad)" height="53" rx="3" width="24" x="515" y="22"></rect>
+</g>
+<!-- Day 13 -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="50" rx="3" width="24" x="560" y="140"></rect>
+<rect fill="#fdd274" height="52" rx="3" width="24" x="560" y="85"></rect>
+<rect fill="url(#llamaGrad)" height="54" rx="3" width="24" x="560" y="28"></rect>
+</g>
+<!-- Day 14 (Latest) -->
+<g class="cursor-pointer group">
+<rect fill="#3A6EA5" height="60" rx="3" width="24" x="605" y="130"></rect>
+<rect fill="#fdd274" height="52" rx="3" width="24" x="605" y="75"></rect>
+<rect fill="url(#llamaGrad)" height="54" rx="3" width="24" x="605" y="18"></rect>
+</g>
+<!-- Smooth Trend Guide Line -->
+<path d="M 32 30 Q 120 40, 212 10 T 437 8 T 617 18" fill="none" opacity="0.65" stroke="#2F6B4F" stroke-dasharray="3 3" stroke-width="2.5"></path>
+</svg>
+<!-- X-Axis Timeline Labels -->
+<div class="flex justify-between items-center px-4 pt-3 text-text-hint font-mono text-[10px]">
+<span>Oct 01</span>
+<span>Oct 05</span>
+<span>Oct 10 (Burst Batch)</span>
+<span>Oct 15</span>
+<span>Oct 20</span>
+<span>Oct 25</span>
+<span>Oct 31 (Today)</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 mt-2 bg-surface-muted/30 -mx-6 -mb-6 px-6 py-3 rounded-b-2xl">
+<div class="flex items-center gap-2 text-text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Peak throughput achieved: <strong>6.8M tokens</strong> on Oct 10 during Oakridge batch ingestion</span>
+</div>
+<button class="text-primary hover:underline font-label-sm text-label-sm font-semibold" onclick="triggerToast('Zooming into raw token time-series');">Inspect Granular Buckets →</button>
+</div>
+</div>
+<!-- Cost & Efficiency Gauge Card (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-lowest p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-title-lg text-title-lg text-text-primary tracking-tight">Scan Efficiency Gauge</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Optimal</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mb-6">Groq token consumption per successful catalog extraction.</p>
+<!-- Circular Arc Visual Chart -->
+<div class="flex flex-col items-center justify-center my-4 relative">
+<svg class="w-44 h-44 -rotate-90" viewBox="0 0 120 120">
+<!-- Background Ring -->
+<circle cx="60" cy="60" fill="none" r="50" stroke="#d5e7db" stroke-width="10"></circle>
+<!-- Progress Ring (82% of target budget utilized, good status) -->
+<circle cx="60" cy="60" fill="none" r="50" stroke="#125238" stroke-dasharray="314" stroke-dashoffset="65" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center text-center">
+<span class="font-headline-xl text-headline-xl text-text-primary font-bold tracking-tight">1,240</span>
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">Tokens / Scan</span>
+<span class="font-label-sm text-label-sm text-primary font-medium mt-0.5">↓ -17% below limit</span>
+</div>
+</div>
+<div class="space-y-3 mt-4">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-secondary">Engineering Target Budget:</span>
+<span class="font-mono text-text-primary font-medium">&lt; 1,500 tokens</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-secondary">Vision Prompt Overhead:</span>
+<span class="font-mono text-text-primary">820 tokens</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-secondary">JSON Schema Structuring:</span>
+<span class="font-mono text-text-primary">420 tokens</span>
+</div>
+</div>
+</div>
+<!-- Action pill -->
+<div class="pt-4 mt-6 bg-surface-muted/40 -mx-6 -mb-6 p-4 rounded-b-2xl">
+<button class="w-full py-2.5 px-4 rounded-full bg-surface-container-high hover:bg-surface-variant text-text-primary font-label-md text-label-md transition-colors flex items-center justify-center gap-2" onclick="triggerToast('Prompt compression heuristic applied. Est. savings: 6%');">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_fix_high</span>
+<span>Optimize System Prompt Context</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Top 10 High-Consumption Accounts / Libraries Table -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden mb-8">
+<div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-lowest">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h2 class="font-title-lg text-title-lg text-text-primary tracking-tight">Top High-Consumption Accounts &amp; Libraries</h2>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">Active Quotas</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary">Governance accounting for libraries utilizing high-frequency Groq batch inference</p>
+</div>
+<!-- Search & Quick Action -->
+<div class="flex items-center gap-3">
+<div class="relative flex items-center bg-surface-muted rounded-full px-3 py-1.5 w-64">
+<span class="material-symbols-outlined text-[18px] text-text-hint mr-2">search</span>
+<input class="bg-transparent border-0 p-0 text-body-sm font-body-sm text-text-primary focus:ring-0 placeholder:text-text-hint w-full" id="librarySearchInput" onkeyup="filterLibraryTable()" placeholder="Search library or owner..." type="text">
+</div>
+<button class="p-2 rounded-full hover:bg-surface-muted text-text-secondary" onclick="triggerToast('Token quotas refreshed from Redis cache');" title="Refresh Table">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+</button>
+</div>
+</div>
+<!-- Clean Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="telemetryTable">
+<thead>
+<tr class="bg-surface-muted/70 text-text-secondary font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3.5 px-6 font-semibold">Rank</th>
+<th class="py-3.5 px-6 font-semibold">Account / Community Hub</th>
+<th class="py-3.5 px-4 font-semibold text-right">Connected Books</th>
+<th class="py-3.5 px-4 font-semibold text-right">Total Scans</th>
+<th class="py-3.5 px-4 font-semibold text-right">Prompt Tokens</th>
+<th class="py-3.5 px-4 font-semibold text-right">Completion</th>
+<th class="py-3.5 px-4 font-semibold text-right">Total Groq Tokens</th>
+<th class="py-3.5 px-4 font-semibold text-right">Cost Share</th>
+<th class="py-3.5 px-6 font-semibold text-center">Quota Status</th>
+<th class="py-3.5 px-6 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-body-sm font-body-sm text-text-primary">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#01</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  OC
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Oakridge Community</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: lib_oak_99182 • Sarah Jenkins</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">8,412</td>
+<td class="py-4 px-4 text-right font-mono">6,840</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">28.4M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">13.8M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-primary">42.2M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">28.4%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Normal</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-primary hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Viewing dossier for Oakridge Community');">Inspect</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#02</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  DT
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Downtown Book Swap</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: lib_dts_44012 • Marcus Vance</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">6,120</td>
+<td class="py-4 px-4 text-right font-mono">5,200</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">21.8M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">9.4M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-primary">31.2M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">21.0%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-warning-soft text-warning font-label-sm text-label-sm font-semibold">88% Quota</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-primary hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Viewing dossier for Downtown Book Swap');">Inspect</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#03</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-secondary text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  MV
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Marcus Vance (Archivist Lab)</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: usr_m_vance_01 • Personal Org</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">4,380</td>
+<td class="py-4 px-4 text-right font-mono">3,980</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">16.2M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">7.1M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-primary">23.3M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">15.7%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Normal</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-primary hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Viewing dossier for Marcus Vance');">Inspect</button>
+</td>
+</tr>
+<!-- Row 4 (Warning State) -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#04</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary-dark text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  NR
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Northside Readers Guild</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: lib_ns_rg_009 • Elena Rostova</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">3,910</td>
+<td class="py-4 px-4 text-right font-mono">3,240</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">12.1M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">5.4M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-primary">17.5M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">11.8%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-warning-soft text-warning font-label-sm text-label-sm font-semibold">91% Warning</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-warning hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Warning notification queued for Northside Guild');">Adjust</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#05</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-tint text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  SJ
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Sarah Jenkins (Personal Curations)</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: usr_sarah_j • Private Collector</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">1,820</td>
+<td class="py-4 px-4 text-right font-mono">1,420</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">6.2M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">2.8M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-primary">9.0M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">6.1%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Normal</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-primary hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Viewing dossier for Sarah Jenkins');">Inspect</button>
+</td>
+</tr>
+<!-- Row 6 (Throttled Burst Event) -->
+<tr class="hover:bg-surface-muted/50 transition-colors group">
+<td class="py-4 px-6 font-mono text-text-hint font-bold">#06</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-error text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  TS
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary truncate">Tobias Sterling (Bulk Importer)</span>
+<span class="font-body-sm text-body-sm text-text-secondary font-mono">ID: usr_tobias_bulk • Antiquarian Batch</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-right font-mono font-medium">1,450</td>
+<td class="py-4 px-4 text-right font-mono">945</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">5.1M</td>
+<td class="py-4 px-4 text-right font-mono text-text-secondary">1.9M</td>
+<td class="py-4 px-4 text-right font-mono font-bold text-text-primary">7.0M</td>
+<td class="py-4 px-4 text-right font-mono font-semibold">4.7%</td>
+<td class="py-4 px-6 text-center">
+<span class="px-2.5 py-0.5 rounded-full bg-error-soft text-error font-label-sm text-label-sm font-semibold">Throttled</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1 rounded-full bg-surface-container-high hover:bg-error hover:text-white transition-colors text-text-primary font-label-sm text-label-sm font-medium" onclick="triggerToast('Cool-down reset applied to Tobias Sterling');">Unthrottle</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination Footer -->
+<div class="p-4 px-6 bg-surface-muted/40 flex items-center justify-between">
+<span class="text-text-hint font-label-sm text-label-sm">Showing 6 of 10 tracked active hubs</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary text-label-sm font-label-sm shadow-sm disabled:opacity-50">Previous</button>
+<button class="px-3 py-1.5 rounded-full bg-primary text-white text-label-sm font-label-sm shadow-sm">1</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary text-label-sm font-label-sm shadow-sm">2</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary text-label-sm font-label-sm shadow-sm">Next</button>
+</div>
+</div>
+</div>
+<!-- Bottom Panel: Live Error Log & Throttling Feed -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-error-soft text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-text-primary tracking-tight">Telemetry Incident &amp; Throttling Feed</h2>
+<span class="font-body-sm text-body-sm text-text-secondary">Automated catch events from Groq rate limiters and external catalog metadata providers</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-surface-muted text-text-secondary font-mono text-[11px]">Auto-clearing in 48h</span>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-text-primary font-label-sm text-label-sm transition-colors" onclick="triggerToast('Error telemetry buffer cleared.');">Clear Buffer</button>
+</div>
+</div>
+<!-- Event List -->
+<div class="flex flex-col gap-3">
+<!-- Incident 1: 429 -->
+<div class="p-4 rounded-xl bg-surface-muted/60 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-surface-muted transition-colors">
+<div class="flex items-start gap-3.5">
+<span class="px-2 py-0.5 rounded-full bg-error-soft text-error font-mono text-[11px] font-bold mt-0.5">HTTP 429</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-text-primary">Groq Cloud: Concurrency Burst Limit Exceeded</span>
+<span class="text-text-hint font-label-sm text-label-sm">• 14 mins ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-0.5">
+              Client <strong class="text-text-primary font-mono">usr_tobias_bulk</strong> submitted 84 simultaneous book spine OCR requests. Exponential backoff retry engaged (resolved in 3.2s).
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+<span class="font-mono font-label-sm text-label-sm text-text-hint">Latency Spike: +1,420ms</span>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest text-text-primary hover:bg-primary-soft hover:text-primary transition-colors text-label-sm font-label-sm shadow-sm" onclick="triggerToast('Retry parameters inspected');">Audit Payload</button>
+</div>
+</div>
+<!-- Incident 2: 503 External Timeout -->
+<div class="p-4 rounded-xl bg-surface-muted/60 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-surface-muted transition-colors">
+<div class="flex items-start gap-3.5">
+<span class="px-2 py-0.5 rounded-full bg-warning-soft text-warning font-mono text-[11px] font-bold mt-0.5">HTTP 503</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-text-primary">Google Books API Timeout • Fallback to OpenLibrary</span>
+<span class="text-text-hint font-label-sm text-label-sm">• 2 hours ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-0.5">
+              ISBN enrichment timed out after 4,000ms. Fallback provider dispatched 12 catalog records with zero token loss.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+<span class="font-mono font-label-sm text-label-sm text-text-hint">Recovered: 100%</span>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest text-text-primary hover:bg-primary-soft hover:text-primary transition-colors text-label-sm font-label-sm shadow-sm" onclick="triggerToast('Fallback configuration confirmed normal');">View Routing</button>
+</div>
+</div>
+<!-- Incident 3: Soft Quota Reached -->
+<div class="p-4 rounded-xl bg-surface-muted/60 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-surface-muted transition-colors">
+<div class="flex items-start gap-3.5">
+<span class="px-2 py-0.5 rounded-full bg-secondary-soft text-secondary font-mono text-[11px] font-bold mt-0.5">QUOTA WARN</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-text-primary">Downtown Book Swap: 85% Monthly Token Threshold</span>
+<span class="text-text-hint font-label-sm text-label-sm">• Yesterday 18:42</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-0.5">
+              Automated advisory email dispatched to library curator Marcus Vance. Standard rate limiting remains active.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+<span class="font-mono font-label-sm text-label-sm text-text-hint">Current: 31.2M / 35.0M</span>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest text-text-primary hover:bg-primary-soft hover:text-primary transition-colors text-label-sm font-label-sm shadow-sm" onclick="triggerToast('Quota increase prompt sent to curator');">Manage Quota</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Dynamic filtering & telemetry demo actions
+  function updateTimeRange(val) {
+    const tokens = document.getElementById('kpi-tokens');
+    if (val === '24h') {
+      tokens.textContent = '4.9M';
+    } else if (val === '7d') {
+      tokens.textContent = '38.2M';
+    } else if (val === '14d') {
+      tokens.textContent = '76.1M';
+    } else {
+      tokens.textContent = '148.2M';
+    }
+    triggerToast(`Telemetry range adjusted to ${val}`);
+  }
+
+  function filterModel(model) {
+    triggerToast(`Filtered telemetry view by: ${model}`);
+  }
+
+  function downloadReport() {
+    triggerToast('Generating telemetry CSV for Groq API Token logs...');
+    setTimeout(() => {
+      triggerToast('Report downloaded: groq_tokens_october_audit.csv');
+    }, 1200);
+  }
+
+  function filterLibraryTable() {
+    const input = document.getElementById('librarySearchInput');
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById('telemetryTable');
+    const tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+      const td = tr[i].getElementsByTagName('td')[1];
+      if (td) {
+        const txtValue = td.textContent || td.innerText;
+        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+          tr[i].style.display = '';
+        } else {
+          tr[i].style.display = 'none';
+        }
+      }
+    }
+  }
+
+  // Toast utility implementation
+  let toastTimer;
+  function triggerToast(text) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = text;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script></main>
+</div>
+<!-- Interactive JS -->
+<script>
+  let currentSelected = 'sarah';
+  let isSuspended = false;
+
+  const userData = {
+    sarah: {
+      name: 'Sarah Jenkins',
+      handle: '@sarah_collector',
+      avatar: 'SJ',
+      role: 'Admin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '4,218,940',
+      scans: '1,420'
+    },
+    marcus: {
+      name: 'Marcus Vance',
+      handle: '@marcus_v',
+      avatar: 'MV',
+      role: 'Superadmin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '11,840,120',
+      scans: '5,890'
+    },
+    elena: {
+      name: 'Elena Rostova',
+      handle: '@elena_books',
+      avatar: 'ER',
+      role: 'Member',
+      isAdmin: false,
+      suspended: true,
+      tokens: '840,190',
+      scans: '312'
+    },
+    tobias: {
+      name: 'Tobias Sterling',
+      handle: '@tobias_lit',
+      avatar: 'TS',
+      role: 'Curator',
+      isAdmin: false,
+      suspended: false,
+      tokens: '2,104,300',
+      scans: '945'
+    },
+    maya: {
+      name: 'Maya Lin',
+      handle: '@mayalib',
+      avatar: 'ML',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '6,712,400',
+      scans: '2,880'
+    },
+    devrim: {
+      name: 'Devrim Kaya',
+      handle: '@devrim_arch',
+      avatar: 'DK',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '320,110',
+      scans: '140'
+    }
+  };
+
+  function selectUser(key) {
+    currentSelected = key;
+    const data = userData[key];
+    if (!data) return;
+
+    document.querySelectorAll('.user-row').forEach(row => {
+      row.classList.remove('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspect';
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-text-secondary');
+      }
+    });
+
+    const selectedRow = document.getElementById('row-' + key);
+    if (selectedRow) {
+      selectedRow.classList.add('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = selectedRow.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspecting';
+        btn.classList.add('text-primary');
+        btn.classList.remove('text-text-secondary');
+      }
+    }
+
+    // Update inspector
+    document.getElementById('inspector-name').textContent = data.name;
+    document.getElementById('inspector-handle').textContent = data.handle;
+    document.getElementById('inspector-avatar').textContent = data.avatar;
+    document.getElementById('inspector-badge').textContent = data.role;
+    document.getElementById('metric-tokens').textContent = data.tokens;
+    document.getElementById('metric-scans').textContent = data.scans;
+
+    const adminToggle = document.getElementById('admin-claim-toggle');
+    if (adminToggle) {
+      adminToggle.checked = data.isAdmin;
+    }
+
+    isSuspended = data.suspended;
+    updateSuspendButtonState();
+
+    triggerToast(`Viewing record for ${data.name}`);
+  }
+
+  function toggleAdminClaim(checkbox) {
+    const targetUser = userData[currentSelected];
+    if (!targetUser) return;
+    targetUser.isAdmin = checkbox.checked;
+    targetUser.role = checkbox.checked ? 'Admin' : 'Member';
+    document.getElementById('inspector-badge').textContent = targetUser.role;
+    triggerToast(`Admin privilege ${checkbox.checked ? 'granted to' : 'revoked from'} ${targetUser.name}`);
+  }
+
+  function handleRevokeTokens() {
+    const data = userData[currentSelected];
+    triggerToast(`Active sessions revoked for ${data.handle}`);
+  }
+
+  function handleToggleSuspend() {
+    isSuspended = !isSuspended;
+    userData[currentSelected].suspended = isSuspended;
+    updateSuspendButtonState();
+    triggerToast(isSuspended ? `Account suspended for ${userData[currentSelected].name}` : `Account reactivated for ${userData[currentSelected].name}`);
+  }
+
+  function updateSuspendButtonState() {
+    const label = document.getElementById('suspend-label');
+    const btn = document.getElementById('suspend-btn');
+    if (isSuspended) {
+      label.textContent = 'Reactivate User Account';
+      btn.classList.remove('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.add('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    } else {
+      label.textContent = 'Suspend User Account';
+      btn.classList.add('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.remove('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    }
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('user-search-input');
+    if (input) input.value = '';
+    selectUser('sarah');
+    triggerToast('Filters reset to default');
+  }
+
+  let toastTimeout;
+  function triggerToast(message) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = message;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script>
+<!-- Slide-over Drawer / Sheet Overlay -->
+
+
+</body></html>

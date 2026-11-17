@@ -135,4 +135,4 @@ GET /wikipedia-book?title=dune&author=frank%20herbert
 ## Notes
 
 - Every route requires a valid Firebase ID token (see [middleware/auth.middleware.ts](middleware/auth.middleware.ts)). Sign in with the Firebase client SDK and send the resulting ID token as `Authorization: Bearer <token>`; the server verifies it against your Firebase project via the Admin SDK (configured in [config/firebase.ts](config/firebase.ts)).
-- Requests and Groq call timing are logged via [pino](https://github.com/pinojs/pino) (see [utils/logger.ts](utils/logger.ts)); HTTP request/response logging is wired up in [server.ts](server.ts) via `pino-http`.
+- Requests and Groq call timing are logged via [pino](https://github.com/pinojs/pino) (see [src/utils/logger.ts](src/utils/logger.ts)); HTTP request/response logging is wired up in [src/app.ts](src/app.ts) via `pino-http`.

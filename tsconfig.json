@@ -13,16 +13,8 @@
     "resolveJsonModule": true
   },
   "include": [
-    "server.ts",
-    "app.ts",
-    "api/**/*.ts",
-    "routes/**/*.ts",
-    "controllers/**/*.ts",
-    "services/**/*.ts",
-    "types/**/*.ts",
-    "constants/**/*.ts",
-    "config/**/*.ts",
-    "middleware/**/*.ts"
+    "src/**/*.ts",
+    "api/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"],
   "ts-node": {

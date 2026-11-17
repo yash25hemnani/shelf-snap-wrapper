@@ -1,0 +1,1016 @@
+<!DOCTYPE html><html lang="en" style="width: 1280px; height: 100%; min-height: 100vh; overflow-x: hidden;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&amp;family=Google+Sans+Text:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Google Sans Text', 'Google Sans', -apple-system, sans-serif; background-color: #fafbfb; color: #1B2B22; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2F6B4F",
+            "primary-dark": "#1F4A36",
+            "primary-soft": "#E3EFE8",
+            "accent": "#3A6EA5",
+            "accent-soft": "#E6EEF7",
+            "secondary": "#A8842F",
+            "secondary-soft": "#FBF1DE",
+            "warning": "#C98A1B",
+            "warning-soft": "#FBF1DE",
+            "error": "#D64545",
+            "error-soft": "#FBEAEA",
+            "text-primary": "#1B2B22",
+            "text-secondary": "#5F6F66",
+            "text-hint": "#9AA8A0",
+            "border-subtle": "#E2E8E4",
+            "surface-muted": "#F4F7F5",
+            "surface-container-high": "#EBF0ED"
+          },
+          fontFamily: {
+            sans: ['"Google Sans Text"', '"Google Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafbfb] antialiased text-text-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white z-50 flex flex-col justify-between border-r border-border-subtle">
+<div class="flex flex-col">
+<!-- Brand / Header -->
+<div class="p-5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[19px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[15px] text-text-primary tracking-tight leading-tight">Admin Console</span>
+<span class="text-[11px] text-text-hint font-medium">Platform Governance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">v1.4</span>
+</div>
+<!-- Navigation -->
+<nav class="p-3.5 flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Overview</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assignment</span>
+<span>Audit Log</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Telemetry &amp; LLM</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">bolt</span>
+<span>Token Tracking</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">warning</span>
+<span>Error Log</span>
+</div>
+<span class="px-2 py-0.2 rounded-full bg-error-soft text-error font-medium text-[11px]">3 active</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Governance</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold text-[13px] bg-primary-soft text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+<span>Content &amp; Libraries</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>Remote Config</span>
+</a>
+</div>
+</nav>
+</div>
+<!-- User / Session Footer -->
+<div class="p-3.5 border-t border-border-subtle bg-white">
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-muted border border-border-subtle">
+<div class="flex items-center gap-2.5">
+<img alt="Alex Chen" class="w-8 h-8 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+<div class="flex flex-col leading-tight">
+<span class="font-semibold text-[13px] text-text-primary">Alex Chen</span>
+<span class="text-[11px] text-text-secondary">Superadmin</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-error transition-colors rounded-lg" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Shell Area -->
+<div class="pl-64 min-h-screen flex flex-col">
+<!-- Topbar -->
+<header class="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-sm border-b border-border-subtle flex items-center justify-between px-8">
+<div class="flex items-center gap-3">
+<span class="text-[13px] font-medium text-text-hint">Governance</span>
+<span class="text-text-hint text-[12px]">/</span>
+<span class="text-[13px] font-semibold text-text-primary">User Directory</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-muted text-text-secondary text-[12px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Directory Sync Active</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle text-text-primary text-[12px] font-medium hover:bg-surface-muted transition-colors">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">sync</span>
+<span>Sync</span>
+</button>
+<img alt="Alex Chen" class="w-7 h-7 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 px-8 py-6 max-w-7xl w-full mx-auto"><div class="flex flex-col w-full gap-6">
+<!-- Top Banner & Quick Controls -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+<div>
+<div class="flex items-center gap-2 text-text-hint font-label-md text-label-md uppercase tracking-wider mb-1">
+<span>Governance</span>
+<span>/</span>
+<span class="text-primary font-semibold">Content &amp; Libraries</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-text-primary tracking-tight">Content &amp; Catalog Moderation</h1>
+<p class="font-body-md text-text-secondary mt-1 max-w-2xl">
+        Supervise shared library hubs, sanitize ISBN book metadata, and resolve circulation locks across decentralized nodes.
+      </p>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2.5 flex-wrap">
+<button class="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-primary font-label-lg text-label-lg transition-colors shadow-sm" onclick="triggerToast('Refreshing decentralized catalog sync nodes...')">
+<span class="material-symbols-outlined text-[18px] text-text-secondary">sync</span>
+<span>Refresh Sync</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-primary font-label-lg text-label-lg transition-colors shadow-sm" onclick="openBatchModal()">
+<span class="material-symbols-outlined text-[18px] text-accent">auto_fix_high</span>
+<span>Batch Sanitize Metadata</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-dark text-on-primary font-label-lg text-label-lg transition-colors shadow-sm" onclick="triggerToast('Opening Hub provisioning wizard...')">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Add Library Hub</span>
+</button>
+</div>
+</div>
+<!-- Metric Quick Ribbon -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-text-hint font-label-sm text-label-sm uppercase tracking-wider">Total Books Cataloged</span>
+<span class="font-headline-sm text-headline-sm text-text-primary mt-1">184,290</span>
+<span class="font-body-sm text-text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">arrow_upward</span>
+          +1,240 this week
+        </span>
+</div>
+<div class="w-11 h-11 rounded-full bg-primary-soft text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">menu_book</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-text-hint font-label-sm text-label-sm uppercase tracking-wider">Active Lending Copies</span>
+<span class="font-headline-sm text-headline-sm text-text-primary mt-1">42,105</span>
+<span class="font-body-sm text-text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-accent">sync_alt</span>
+          78.2% circulation rate
+        </span>
+</div>
+<div class="w-11 h-11 rounded-full bg-accent-soft text-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">swap_horiz</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-text-hint font-label-sm text-label-sm uppercase tracking-wider">Duplicate ISBNs Flagged</span>
+<span class="font-headline-sm text-headline-sm text-warning mt-1">18</span>
+<span class="font-body-sm text-text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-warning">pending</span>
+          Requires deduplication
+        </span>
+</div>
+<div class="w-11 h-11 rounded-full bg-warning-soft text-warning flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">difference</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-text-hint font-label-sm text-label-sm uppercase tracking-wider">Unreturned Overdue Locks</span>
+<span class="font-headline-sm text-headline-sm text-error mt-1">7</span>
+<span class="font-body-sm text-text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-error">lock_clock</span>
+          Holding borrower deposit
+        </span>
+</div>
+<div class="w-11 h-11 rounded-full bg-error-soft text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">lock_reset</span>
+</div>
+</div>
+</div>
+<!-- Main Workstation (Tabs + Split Grid with Drawer) -->
+<div class="flex flex-col gap-5">
+<!-- Tab Navigation -->
+<div class="flex items-center justify-between overflow-x-auto pb-1 gap-4">
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-primary text-on-primary" id="tab-btn-libraries" onclick="switchTab('libraries')">
+<span class="material-symbols-outlined text-[18px]">local_library</span>
+<span>Community Libraries</span>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/20 text-on-primary">142</span>
+</button>
+<button class="px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-surface-muted text-text-secondary hover:text-text-primary" id="tab-btn-sanitizer" onclick="switchTab('sanitizer')">
+<span class="material-symbols-outlined text-[18px]">auto_fix_normal</span>
+<span>Metadata Sanitizer</span>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-warning-soft text-warning font-semibold">18 Pending</span>
+</button>
+<button class="px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-surface-muted text-text-secondary hover:text-text-primary" id="tab-btn-locks" onclick="switchTab('locks')">
+<span class="material-symbols-outlined text-[18px]">lock_clock</span>
+<span>Circulation &amp; Overdue Locks</span>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-error-soft text-error font-semibold">7</span>
+</button>
+<button class="px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-surface-muted text-text-secondary hover:text-text-primary" id="tab-btn-reviews" onclick="switchTab('reviews')">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+<span>Flagged User Reviews</span>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-variant text-text-secondary">3</span>
+</button>
+</div>
+<!-- Quick Status Health Indicator -->
+<div class="hidden xl:flex items-center gap-2 text-text-secondary font-label-sm text-label-sm px-3 py-1.5 rounded-full bg-surface-container-high">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span>ISBN Sync Worker #402 Healthy (Latency 48ms)</span>
+</div>
+</div>
+<!-- Filter & Query Control Strip -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined text-[18px] text-text-hint absolute left-3.5 top-1/2 -translate-y-1/2">search</span>
+<input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-muted text-text-primary placeholder:text-text-hint font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest transition-all" id="catalog-search" placeholder="Search by ISBN, title, author, or library name..." type="text">
+</div>
+<div class="flex items-center gap-2.5 w-full md:w-auto overflow-x-auto">
+<!-- Status Dropdown -->
+<div class="relative">
+<select class="h-11 px-3.5 pr-8 rounded-xl bg-surface-muted text-text-secondary font-label-md text-label-md appearance-none focus:outline-none cursor-pointer">
+<option>Status: All Records</option>
+<option>Status: Verified Clean</option>
+<option>Status: Needs Attention</option>
+<option>Status: Disputed</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-text-hint absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<!-- Sync Health -->
+<div class="relative">
+<select class="h-11 px-3.5 pr-8 rounded-xl bg-surface-muted text-text-secondary font-label-md text-label-md appearance-none focus:outline-none cursor-pointer">
+<option>Sync Health: All</option>
+<option>Sync Health: Synced (0 drift)</option>
+<option>Sync Health: Drifted (&gt;2 edits)</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-text-hint absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<!-- Visibility -->
+<div class="relative">
+<select class="h-11 px-3.5 pr-8 rounded-xl bg-surface-muted text-text-secondary font-label-md text-label-md appearance-none focus:outline-none cursor-pointer">
+<option>Visibility: Public Hubs</option>
+<option>Visibility: Private Restricted</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-text-hint absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<button class="p-2.5 rounded-xl bg-surface-muted hover:bg-surface-variant text-text-secondary hover:text-text-primary transition-colors" onclick="resetFilters()" title="Reset Filters">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</button>
+</div>
+</div>
+<!-- Content Workspace: Two Column Layout (Table Catalog + Dynamic Resolver Drawer) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- Catalog Moderation Table (8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-4">
+<!-- Table Card -->
+<div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden flex flex-col">
+<div class="p-4 flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-text-primary">Catalog Registry &amp; Copy Audit</span>
+<span class="px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">4 Highlighted Cases</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-hint">Page 1 of 46</span>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-muted text-text-secondary font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3 px-4">Book &amp; ISBN</th>
+<th class="py-3 px-4">Author / Publisher</th>
+<th class="py-3 px-4">Holding Libraries</th>
+<th class="py-3 px-4">Moderation State</th>
+<th class="py-3 px-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-muted text-text-primary font-body-md text-body-md">
+<!-- Item 1: The Great Gatsby -->
+<tr class="hover:bg-surface-muted cursor-pointer transition-colors group" id="row-gatsby" onclick="loadBookComparison('gatsby')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-16 rounded-md bg-surface-variant overflow-hidden flex-shrink-0 shadow-sm relative">
+<img class="w-full h-full object-cover" data-alt="Vintage art-deco book cover of The Great Gatsby with deep midnight blue aesthetic and green starlight illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHzI4yIulq0xROVFrDKXSDurr58l4GbW2a9ayPTkjvIHSJvOzunJIeHz4ztuuk8gQawXNl9YeBHLx-GIjguAHV1zm6bpC3PxAktRwhfRoRD25cn21g3ykxHdE6FVqGgDaqGgfR-LXHPdqQc2mzq5HK1v716EG5ig4fF7Hw4Svfq-nGcjnR2z3k_Sj7XFKWSVnn79fzpf5pHgK16Q5tw75-0Bh-JMWWAKfi8d9byHY">
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary group-hover:text-primary transition-colors truncate">The Great Gatsby</span>
+<span class="font-label-sm text-label-sm text-text-hint font-mono mt-0.5">ISBN 978-0743273565</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Classics / Modernist</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary">F. Scott Fitzgerald</span>
+<span class="font-body-sm text-body-sm text-text-hint">Scribner Classics • 180 pp.</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">storefront</span>
+                        Oakridge Community
+                      </span>
+<span class="font-body-sm text-body-sm text-text-secondary">4 physical copies (3 on shelf)</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label-sm text-label-sm bg-primary-soft text-primary font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                      Clean &amp; Verified
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-3 py-1.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-primary font-label-sm text-label-sm transition-colors" onclick="event.stopPropagation(); loadBookComparison('gatsby')">
+                      Inspect
+                    </button>
+</td>
+</tr>
+<!-- Item 2: Dune: Messiah -->
+<tr class="hover:bg-surface-muted cursor-pointer transition-colors group bg-warning-soft/30 ring-2 ring-primary" id="row-dune" onclick="loadBookComparison('dune')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-16 rounded-md bg-surface-variant overflow-hidden flex-shrink-0 shadow-sm relative flex items-center justify-center">
+<img class="w-full h-full object-cover blur-[1px] opacity-80" data-alt="Low resolution pixelated desert sci-fi cover of Dune Messiah with harsh orange and sand ochre tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeibVkaFi-UuUEvnGHUD4RJWo6NwpsCQ2Sci97sm3IVQm9evWH3ZbKMhF_fX-V_GbeGDBF67ONXuBzmqfLCXNb8kKWqyiKVa1_kx9pqpRqE--RPqSmyHrYPRBeDthPrGCHccq53edQBQ98KRIIMFz6Nv7dOdRNq_FKFJngVAewlmYewyoUZHmPmDIW2J5IBp1STKqRuC1MrpTZik3X1u_UKATTv7qtqyrm7-PLhJA">
+<span class="absolute bottom-1 right-1 material-symbols-outlined text-[14px] text-warning bg-surface-container-lowest rounded-full p-0.5">broken_image</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary group-hover:text-primary transition-colors truncate">Dune: Messiah</span>
+<span class="font-label-sm text-label-sm text-text-hint font-mono mt-0.5">ISBN 978-0441172696</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Science Fiction / Space Opera</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary">Frank Herbert</span>
+<span class="font-body-sm text-body-sm text-text-hint">Ace Books • 336 pp.</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-accent">storefront</span>
+                        Downtown Book Swap
+                      </span>
+<span class="font-body-sm text-body-sm text-text-secondary">2 physical copies (Both out)</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label-sm text-label-sm bg-warning-soft text-warning font-semibold">
+<span class="material-symbols-outlined text-[14px]">hide_image</span>
+                      Missing High-Res Cover
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1.5" onclick="event.stopPropagation()">
+<button class="px-3 py-1.5 rounded-full bg-primary hover:bg-primary-dark text-on-primary font-label-sm text-label-sm transition-colors shadow-sm" onclick="loadBookComparison('dune')">
+                        Sanitize
+                      </button>
+</div>
+</td>
+</tr>
+<!-- Item 3: Project Hail Mary -->
+<tr class="hover:bg-surface-muted cursor-pointer transition-colors group bg-error-soft/20" id="row-hailmary" onclick="loadBookComparison('hailmary')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-16 rounded-md bg-surface-variant overflow-hidden flex-shrink-0 shadow-sm relative">
+<img class="w-full h-full object-cover" data-alt="Cover of Project Hail Mary featuring deep space golden star trails and astronaut orbital perspective" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChHnyLkamo_25_pDcL9I7zlQpegq-jFG7-wdQ32Yw_kSDz8BdgRVZfXzL-5UWcD4GTZ_1YyUGLuO2A6-qx0rDhM7ip3fRXvu9tsEByze-tZHgRl9wqKJ2Ss6AAf8vTU2sMf_ELZveYdol3KhT_LU759fZpsuHCzOLC5f0xXXhsjJOiMuMipFw-ruNENW-MMYpxC5arfi6XmZgUh09FyAcG738G1GChbkDVcAxI6rQ">
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary group-hover:text-primary transition-colors truncate">Project Hail Mary</span>
+<span class="font-label-sm text-label-sm text-text-hint font-mono mt-0.5">ISBN 978-0593135204</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Hard Sci-Fi / Space Survival</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary">Andy Weir</span>
+<span class="font-body-sm text-body-sm text-text-hint">Ballantine Books • 496 pp.</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-error">warning</span>
+                        Oakridge Community
+                      </span>
+<span class="font-body-sm text-body-sm text-error font-medium">Copy #c-409 overdue 45 days</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label-sm text-label-sm bg-error-soft text-error font-semibold">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                      Circulation Dispute
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1.5" onclick="event.stopPropagation()">
+<button class="px-3 py-1.5 rounded-full bg-error text-on-error hover:bg-error/90 font-label-sm text-label-sm transition-colors shadow-sm" onclick="forceReleaseLock('Project Hail Mary', '#c-409')">
+                        Release Lock
+                      </button>
+</div>
+</td>
+</tr>
+<!-- Item 4: Designing Data-Intensive Applications -->
+<tr class="hover:bg-surface-muted cursor-pointer transition-colors group" id="row-ddia" onclick="loadBookComparison('ddia')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-16 rounded-md bg-surface-variant overflow-hidden flex-shrink-0 shadow-sm relative">
+<img class="w-full h-full object-cover" data-alt="Technical handbook cover with wild animal engraving style illustration representing reliable scalable systems" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN34qJryz0d85pJshAHuj_XcPOtAStDM0raW5GDXXM5OfsSs28GjqM6fqQoNaE6PhY72JUHXHMC4OmdEJk-0HW0kyrQdZcxbOzWIuj28I0kib3-8ef_Bbgzx7L0S0CkuPZaup2G8wsAjCjxJ8ASW0p4In6aCStQVCULFC6ATPrW4A15ADRGZ8gdGl8mgGyHW_xymJbpw2E4Qay6Dv2gJCvLSHXdjHXbxQJ7JROHy0">
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-text-primary group-hover:text-primary transition-colors truncate">Designing Data-Intensive Apps</span>
+<span class="font-label-sm text-label-sm text-text-hint font-mono mt-0.5">ISBN 978-1449373320</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Computing / Architecture</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary">Martin Kleppmann</span>
+<span class="font-body-sm text-body-sm text-text-hint">O'Reilly Media • 616 pp.</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex flex-col">
+<span class="font-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">groups</span>
+                        Westside Tech Hub
+                      </span>
+<span class="font-body-sm text-body-sm text-accent font-semibold">12 Waitlist Reservations</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label-sm text-label-sm bg-primary-soft text-primary font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                      High Demand (Healthy)
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-3 py-1.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-primary font-label-sm text-label-sm transition-colors" onclick="event.stopPropagation(); loadBookComparison('ddia')">
+                      Inspect
+                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer -->
+<div class="p-4 bg-surface-muted flex flex-col sm:flex-row items-center justify-between gap-3 text-text-secondary font-label-sm text-label-sm">
+<span>Showing 4 of 184,290 items matching active filters</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary transition-colors shadow-sm disabled:opacity-40" disabled="">Previous</button>
+<button class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-semibold">1</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary transition-colors shadow-sm">2</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary transition-colors shadow-sm">3</button>
+<span class="text-text-hint">...</span>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary transition-colors shadow-sm">46</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-text-secondary hover:text-text-primary transition-colors shadow-sm">Next</button>
+</div>
+</div>
+</div>
+<!-- Inline Visual Health Chart -->
+<div class="p-5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex flex-col gap-1 max-w-sm">
+<span class="font-title-md text-title-md text-text-primary">Catalog Metadata Health Distribution</span>
+<p class="font-body-sm text-body-sm text-text-secondary">
+              94.8% of user catalog submissions are automatedly verified via Google Books and OpenLibrary API reconciliation.
+            </p>
+</div>
+<!-- Progress Ring & Metric Bars -->
+<div class="flex items-center gap-6 w-full md:w-auto">
+<div class="flex items-center gap-3">
+<svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+<circle class="stroke-surface-container-high" cx="18" cy="18" fill="none" r="15.915" stroke-width="3"></circle>
+<circle class="stroke-primary" cx="18" cy="18" fill="none" r="15.915" stroke-dasharray="94.8, 100" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">94.8%</span>
+<span class="font-label-sm text-label-sm text-text-hint">Reconciled</span>
+</div>
+</div>
+<div class="h-10 w-px bg-surface-container-high hidden sm:block"></div>
+<div class="flex flex-col gap-1.5 min-w-[160px]">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-text-secondary">Verified Clean</span>
+<span class="font-semibold text-primary">174,706</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-text-secondary">Pending OCR Fix</span>
+<span class="font-semibold text-warning">18</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-text-secondary">Overdue Dispute</span>
+<span class="font-semibold text-error">7</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Sanitize Panel: ISBN Metadata Resolver (4 Cols) -->
+<div class="xl:col-span-4 flex flex-col gap-4 sticky top-20">
+<div class="rounded-xl bg-surface-container-lowest shadow-sm p-5 flex flex-col gap-5">
+<!-- Panel Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">compare</span>
+<span class="font-title-md text-title-md text-text-primary">ISBN Metadata Resolver</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-warning-soft text-warning" id="resolver-badge">Missing High-Res Cover</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary">
+            Resolving metadata discrepancies between the user OCR scan payload and Google Books API canonical record.
+          </p>
+<!-- Book Identifier Mini Bar -->
+<div class="p-3 rounded-lg bg-surface-muted flex items-center justify-between">
+<div class="flex items-center gap-2 truncate">
+<span class="material-symbols-outlined text-[18px] text-text-secondary">qr_code_2</span>
+<span class="font-mono text-label-sm font-label-sm text-text-primary font-semibold truncate" id="resolver-isbn">978-0441172696</span>
+</div>
+<span class="font-label-sm text-label-sm text-accent font-semibold">Diff Detected</span>
+</div>
+<!-- Side-by-Side Comparison Container -->
+<div class="grid grid-cols-2 gap-3 p-3 rounded-xl bg-surface-muted/60">
+<!-- Left: User Scanned Data -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-1 text-text-hint font-label-sm text-label-sm uppercase tracking-wide">
+<span class="material-symbols-outlined text-[14px]">person</span>
+<span>User Scan OCR</span>
+</div>
+<!-- Cover Preview -->
+<div class="h-28 rounded-lg bg-surface-variant overflow-hidden relative shadow-inner">
+<img class="w-full h-full object-cover" data-alt="Tilted grainy smartphone photo of a paperback Dune Messiah cover taken in dim indoor lighting" id="resolver-user-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC25xe7-lQ6A2fxPFFeMlc2kUroQ96cq8cHMuJIGWu-o--hbmihjMhPaRE_Yjelw5v6k5L3gVQ8H_5ALSN3STbbnugBfWM1GLSf1mHsMfWXA00aJ2-9tCMmalMi78MbMHwIfYH8uYwj99AMQMdt-vh2ksla--z9Llm3ZI6NkggQtuih9MQYV5GJyJ-1_IQs1ee8HXTDNmvAvoxQQpwuoVyOrA2na7vjyOjD6zu4RI">
+<span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[10px] bg-text-primary/70 text-white font-mono">180 DPI</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Scanned Title:</span>
+<span class="font-label-md text-label-md font-semibold text-text-primary line-clamp-1" id="resolver-user-title">Dune Messiah (Vol 2)</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Publisher:</span>
+<span class="font-body-sm text-body-sm text-text-secondary" id="resolver-user-pub">Ace Publishing Inc</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Page Count:</span>
+<span class="font-mono text-body-sm text-text-secondary" id="resolver-user-pages">334 pp.</span>
+</div>
+</div>
+<!-- Right: Canonical Google Books API Data -->
+<div class="flex flex-col gap-3 p-2 rounded-lg bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-1 text-primary font-label-sm text-label-sm uppercase tracking-wide font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Google Books</span>
+</div>
+<!-- High-Res Cover Art Selector -->
+<div class="h-28 rounded-lg bg-surface-muted overflow-hidden relative shadow-inner ring-2 ring-primary">
+<img class="w-full h-full object-cover" data-alt="High definition crisp digital rendering of Dune Messiah Frank Herbert canonical collector book jacket" id="resolver-api-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChz7YpLmnvOA7vTWTjL-nt73qO839E6bUPXdIRnZ0tJTc8yR0PjKIVSrlj4Xp8dRWl-5v5dTNLFRezK6oJkNQ8Ak9MO9_T3a9bWRH9gfNR2psgKMW1KBr2JqqJc95yebjvuinSomhOSZLfqaLMazt84NHmf0H27u804m3GgCIpMU1xVgfyXECOcNyzO8m0aMAHnml57Tq6RszcxwxMuqfJr8Nah57umF7QDFCMuqc">
+<span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[10px] bg-primary text-on-primary font-mono font-semibold">HD 600 DPI</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Canonical Title:</span>
+<span class="font-label-md text-label-md font-semibold text-primary line-clamp-1" id="resolver-api-title">Dune Messiah</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Publisher:</span>
+<span class="font-body-sm text-body-sm text-text-secondary" id="resolver-api-pub">Ace Books (Penguin Group)</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-text-hint">Verified Pages:</span>
+<span class="font-mono text-body-sm text-text-secondary" id="resolver-api-pages">336 pp.</span>
+</div>
+</div>
+</div>
+<!-- Cover Art Selector Options -->
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-hint">Select Jacket Art:</span>
+<div class="grid grid-cols-3 gap-2">
+<div class="p-1 rounded-lg bg-surface-muted ring-2 ring-primary cursor-pointer flex flex-col items-center">
+<div class="w-full h-12 rounded bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Ace classic paperback cover of Dune Messiah Frank Herbert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlShyz8KPfKieEFSeY3zqGrmq6moqeuDBAKebYpt2cpZvSzQ8fEY2A3rO7UqEBRKxrdKMthcIbpU4dOZib3T5NRIUvTTRjs2W0tBqMwDtV598RtUrZrrEFa69u6_ECfRX2RgK4bsEm7tzTeP-yxv9qEzA6u0pfME1FjDuLF02Q7FMRQa2hqOCGDLfLyrIFiRldUGLBi08FsCJlfEL18Br30av_SfRbnwp68VkzzN0">
+</div>
+<span class="font-label-sm text-[10px] text-primary mt-1 font-semibold">Ace 1987</span>
+</div>
+<div class="p-1 rounded-lg bg-surface-muted hover:bg-surface-variant cursor-pointer flex flex-col items-center">
+<div class="w-full h-12 rounded bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Modern minimalist deluxe edition cover art of Dune Messiah with gold foil typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOlar4M2zpIIoyAN-_BKPgxC29lUermZhRMS3alPVMHLnnDkSJzBn7ib1thd63LJLpYHaWqE5ZsZB_fhzfjmEZRuWGc9HqIYl1GWR-QBRVFsgSTsEiZwjdMi4Vn7YIRiYBKiE1U3m14tfLWGiMEpYipxTayufwM1-xnmXnE9kM9bMSuqWAWkLGR-o3-kPpWEQY8rrdA2-7ThiGe57etf5_BQlWRED3xDlKLhXHISI">
+</div>
+<span class="font-label-sm text-[10px] text-text-secondary mt-1">Deluxe 2021</span>
+</div>
+<div class="p-1 rounded-lg bg-surface-muted hover:bg-surface-variant cursor-pointer flex flex-col items-center">
+<div class="w-full h-12 rounded bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Gollancz SF Masterworks yellow spine book edition cover of Dune Messiah" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRfL6Rp-SGfKciOnU5munrimdWsEX8nXSfzPTBr45LCHo86DA8K6EhqjBq3nBOevy9lyCt1FoJK7AifxcYELi1xz2nSpM5Ay46mkt5w2y_uWooGye5452gkyXEmepL4COFE2le12V9vXgIH44QwLUq3qVVPx6y6DXT8AdBf-YtBSCnBdm6LIKkqOkMHJ6E-DNJIlen1cVto2513Rjv0Xo_AG1wW9CcLIs8AFspAY0">
+</div>
+<span class="font-label-sm text-[10px] text-text-secondary mt-1">Masterworks</span>
+</div>
+</div>
+</div>
+<!-- Sanitize Action Buttons -->
+<div class="flex flex-col gap-2 pt-2">
+<button class="w-full py-3 rounded-full bg-primary hover:bg-primary-dark text-on-primary font-label-lg text-label-lg transition-colors flex items-center justify-center gap-2 shadow-sm" onclick="approveOverwrite()">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+<span>Approve &amp; Overwrite</span>
+</button>
+<button class="w-full py-2.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-secondary hover:text-text-primary font-label-lg text-label-lg transition-colors flex items-center justify-center gap-2" onclick="rejectSubmission()">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span>Reject Submission</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Toast Notification Element -->
+<div class="fixed bottom-6 right-6 z-50 transform transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-full bg-text-primary text-on-primary shadow-xl translate-y-20 opacity-0 pointer-events-none" id="toast-banner">
+<span class="material-symbols-outlined text-[20px] text-primary-soft">info</span>
+<span class="font-label-md text-label-md" id="toast-msg">Inspecting ISBN resolver data for Dune Messiah</span>
+<button class="ml-2 text-text-hint hover:text-white transition-colors" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<!-- Client-side Interactive Logic -->
+<script>
+  const catalogPayloads = {
+    gatsby: {
+      isbn: '978-0743273565',
+      userTitle: 'The Great Gatsby',
+      userPub: 'Scribner New York',
+      userPages: '180 pp.',
+      apiTitle: 'The Great Gatsby: Scribner Edition',
+      apiPub: 'Scribner Classic Books',
+      apiPages: '180 pp.',
+      badge: 'Clean & Verified',
+      badgeColor: 'bg-primary-soft text-primary'
+    },
+    dune: {
+      isbn: '978-0441172696',
+      userTitle: 'Dune Messiah (Vol 2)',
+      userPub: 'Ace Publishing Inc',
+      userPages: '334 pp.',
+      apiTitle: 'Dune Messiah',
+      apiPub: 'Ace Books (Penguin Group)',
+      apiPages: '336 pp.',
+      badge: 'Missing High-Res Cover',
+      badgeColor: 'bg-warning-soft text-warning'
+    },
+    hailmary: {
+      isbn: '978-0593135204',
+      userTitle: 'Project Hail Mary (Novel)',
+      userPub: 'Ballantine Pub',
+      userPages: '496 pp.',
+      apiTitle: 'Project Hail Mary',
+      apiPub: 'Ballantine Books / Random House',
+      apiPages: '496 pp.',
+      badge: 'Circulation Dispute',
+      badgeColor: 'bg-error-soft text-error'
+    },
+    ddia: {
+      isbn: '978-1449373320',
+      userTitle: 'Designing Data-Intensive Apps',
+      userPub: 'O Reilly Media Inc',
+      userPages: '614 pp.',
+      apiTitle: 'Designing Data-Intensive Applications',
+      apiPub: 'O\'Reilly Media',
+      apiPages: '616 pp.',
+      badge: 'Verified Clean',
+      badgeColor: 'bg-primary-soft text-primary'
+    }
+  };
+
+  let activeBookKey = 'dune';
+
+  function loadBookComparison(key) {
+    activeBookKey = key;
+    const item = catalogPayloads[key];
+    if (!item) return;
+
+    // Highlight row
+    ['gatsby', 'dune', 'hailmary', 'ddia'].forEach(id => {
+      const el = document.getElementById('row-' + id);
+      if (el) el.classList.remove('ring-2', 'ring-primary');
+    });
+    const targetRow = document.getElementById('row-' + key);
+    if (targetRow) targetRow.classList.add('ring-2', 'ring-primary');
+
+    // Update Resolver Panel
+    document.getElementById('resolver-isbn').textContent = item.isbn;
+    document.getElementById('resolver-user-title').textContent = item.userTitle;
+    document.getElementById('resolver-user-pub').textContent = item.userPub;
+    document.getElementById('resolver-user-pages').textContent = item.userPages;
+
+    document.getElementById('resolver-api-title').textContent = item.apiTitle;
+    document.getElementById('resolver-api-pub').textContent = item.apiPub;
+    document.getElementById('resolver-api-pages').textContent = item.apiPages;
+
+    const badge = document.getElementById('resolver-badge');
+    badge.textContent = item.badge;
+    badge.className = `px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold ${item.badgeColor}`;
+
+    triggerToast(`Inspecting ISBN resolver data for ${item.apiTitle}`);
+  }
+
+  function approveOverwrite() {
+    const item = catalogPayloads[activeBookKey];
+    triggerToast(`Overwritten canonical metadata and approved jacket for ISBN ${item.isbn}`);
+    const badge = document.getElementById('resolver-badge');
+    badge.textContent = 'Clean & Verified';
+    badge.className = 'px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-primary-soft text-primary';
+  }
+
+  function rejectSubmission() {
+    const item = catalogPayloads[activeBookKey];
+    triggerToast(`Rejected OCR submission for ${item.userTitle}. Re-queued for physical audit.`);
+  }
+
+  function forceReleaseLock(bookTitle, copyId) {
+    triggerToast(`Force released circulation lock on ${bookTitle} (${copyId}). Deposit held in escrow.`);
+  }
+
+  function openBatchModal() {
+    triggerToast('Batch Metadata Sanitizer: 18 pending ISBN records reconciled.');
+  }
+
+  function resetFilters() {
+    const search = document.getElementById('catalog-search');
+    if (search) search.value = '';
+    loadBookComparison('dune');
+    triggerToast('Catalog filters reset to default view.');
+  }
+
+  function switchTab(tabName) {
+    const tabs = ['libraries', 'sanitizer', 'locks', 'reviews'];
+    tabs.forEach(t => {
+      const btn = document.getElementById('tab-btn-' + t);
+      if (!btn) return;
+      if (t === tabName) {
+        btn.className = 'px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-primary text-on-primary';
+      } else {
+        btn.className = 'px-4 py-2 rounded-full font-label-lg text-label-lg transition-all flex items-center gap-2 bg-surface-muted text-text-secondary hover:text-text-primary';
+      }
+    });
+
+    if (tabName === 'sanitizer') {
+      loadBookComparison('dune');
+    } else if (tabName === 'locks') {
+      loadBookComparison('hailmary');
+    } else {
+      loadBookComparison('gatsby');
+    }
+  }
+
+  let toastTimer;
+  function triggerToast(msg) {
+    const toast = document.getElementById('toast-banner');
+    const toastMsg = document.getElementById('toast-msg');
+    if (!toast || !toastMsg) return;
+
+    toastMsg.textContent = msg;
+    toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    toast.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      dismissToast();
+    }, 3200);
+  }
+
+  function dismissToast() {
+    const toast = document.getElementById('toast-banner');
+    if (!toast) return;
+    toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    toast.classList.remove('translate-y-0', 'opacity-100');
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    loadBookComparison('dune');
+  });
+</script></main>
+</div>
+<!-- Interactive JS -->
+<script>
+  let currentSelected = 'sarah';
+  let isSuspended = false;
+
+  const userData = {
+    sarah: {
+      name: 'Sarah Jenkins',
+      handle: '@sarah_collector',
+      avatar: 'SJ',
+      role: 'Admin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '4,218,940',
+      scans: '1,420'
+    },
+    marcus: {
+      name: 'Marcus Vance',
+      handle: '@marcus_v',
+      avatar: 'MV',
+      role: 'Superadmin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '11,840,120',
+      scans: '5,890'
+    },
+    elena: {
+      name: 'Elena Rostova',
+      handle: '@elena_books',
+      avatar: 'ER',
+      role: 'Member',
+      isAdmin: false,
+      suspended: true,
+      tokens: '840,190',
+      scans: '312'
+    },
+    tobias: {
+      name: 'Tobias Sterling',
+      handle: '@tobias_lit',
+      avatar: 'TS',
+      role: 'Curator',
+      isAdmin: false,
+      suspended: false,
+      tokens: '2,104,300',
+      scans: '945'
+    },
+    maya: {
+      name: 'Maya Lin',
+      handle: '@mayalib',
+      avatar: 'ML',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '6,712,400',
+      scans: '2,880'
+    },
+    devrim: {
+      name: 'Devrim Kaya',
+      handle: '@devrim_arch',
+      avatar: 'DK',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '320,110',
+      scans: '140'
+    }
+  };
+
+  function selectUser(key) {
+    currentSelected = key;
+    const data = userData[key];
+    if (!data) return;
+
+    document.querySelectorAll('.user-row').forEach(row => {
+      row.classList.remove('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspect';
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-text-secondary');
+      }
+    });
+
+    const selectedRow = document.getElementById('row-' + key);
+    if (selectedRow) {
+      selectedRow.classList.add('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = selectedRow.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspecting';
+        btn.classList.add('text-primary');
+        btn.classList.remove('text-text-secondary');
+      }
+    }
+
+    // Update inspector
+    document.getElementById('inspector-name').textContent = data.name;
+    document.getElementById('inspector-handle').textContent = data.handle;
+    document.getElementById('inspector-avatar').textContent = data.avatar;
+    document.getElementById('inspector-badge').textContent = data.role;
+    document.getElementById('metric-tokens').textContent = data.tokens;
+    document.getElementById('metric-scans').textContent = data.scans;
+
+    const adminToggle = document.getElementById('admin-claim-toggle');
+    if (adminToggle) {
+      adminToggle.checked = data.isAdmin;
+    }
+
+    isSuspended = data.suspended;
+    updateSuspendButtonState();
+
+    triggerToast(`Viewing record for ${data.name}`);
+  }
+
+  function toggleAdminClaim(checkbox) {
+    const targetUser = userData[currentSelected];
+    if (!targetUser) return;
+    targetUser.isAdmin = checkbox.checked;
+    targetUser.role = checkbox.checked ? 'Admin' : 'Member';
+    document.getElementById('inspector-badge').textContent = targetUser.role;
+    triggerToast(`Admin privilege ${checkbox.checked ? 'granted to' : 'revoked from'} ${targetUser.name}`);
+  }
+
+  function handleRevokeTokens() {
+    const data = userData[currentSelected];
+    triggerToast(`Active sessions revoked for ${data.handle}`);
+  }
+
+  function handleToggleSuspend() {
+    isSuspended = !isSuspended;
+    userData[currentSelected].suspended = isSuspended;
+    updateSuspendButtonState();
+    triggerToast(isSuspended ? `Account suspended for ${userData[currentSelected].name}` : `Account reactivated for ${userData[currentSelected].name}`);
+  }
+
+  function updateSuspendButtonState() {
+    const label = document.getElementById('suspend-label');
+    const btn = document.getElementById('suspend-btn');
+    if (isSuspended) {
+      label.textContent = 'Reactivate User Account';
+      btn.classList.remove('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.add('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    } else {
+      label.textContent = 'Suspend User Account';
+      btn.classList.add('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.remove('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    }
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('user-search-input');
+    if (input) input.value = '';
+    selectUser('sarah');
+    triggerToast('Filters reset to default');
+  }
+
+  let toastTimeout;
+  function triggerToast(message) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = message;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script>
+<!-- Slide-over Drawer / Sheet Overlay -->
+
+
+</body></html>

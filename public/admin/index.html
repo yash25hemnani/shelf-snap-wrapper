@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Dashboard</h1>
+            <p>Totals, usage trends and the token panel arrive in Phase 3. For now this page
+              checks that sign-in, the admin claim and the admin API all work end to end.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <section class="card" aria-labelledby="check-title">
+            <div class="card-header">
+              <h2 class="title-md" id="check-title">Connection check</h2>
+              <button class="btn btn-outline btn-sm" id="rerun" type="button">
+                <span class="material-symbols-outlined">refresh</span>
+                Run again
+              </button>
+            </div>
+            <ul class="check-list">
+              <li class="check-item" data-check="signin" data-state="pending">
+                <span class="material-symbols-outlined status-icon">progress_activity</span>
+                <div class="check-text">
+                  <div>Signed in with Firebase</div>
+                  <div class="check-detail"></div>
+                </div>
+              </li>
+              <li class="check-item" data-check="claim" data-state="pending">
+                <span class="material-symbols-outlined status-icon">progress_activity</span>
+                <div class="check-text">
+                  <div>Admin claim on the token</div>
+                  <div class="check-detail"></div>
+                </div>
+              </li>
+              <li class="check-item" data-check="api" data-state="pending">
+                <span class="material-symbols-outlined status-icon">progress_activity</span>
+                <div class="check-text">
+                  <div>Server accepts the token</div>
+                  <div class="check-detail mono">GET /api/admin/me</div>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="me-title">
+            <div class="card-header">
+              <h2 class="title-md" id="me-title">What the server sees</h2>
+              <span class="badge badge-primary" id="me-badge" hidden>Admin</span>
+            </div>
+            <div id="me-body" class="empty-state">
+              <span class="material-symbols-outlined">hourglass_empty</span>
+              Waiting for the check to finish.
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { isAdmin } from "/admin/js/firebase.js";
+    import { api } from "/admin/js/api.js";
+
+    const ICONS = { ok: "check_circle", fail: "cancel", pending: "progress_activity" };
+
+    function setCheck(name, state, detail) {
+      const item = document.querySelector(`[data-check="${name}"]`);
+      item.dataset.state = state;
+      item.querySelector(".status-icon").textContent = ICONS[state];
+      if (detail !== undefined) item.querySelector(".check-detail").textContent = detail;
+    }
+
+    function formatTime(seconds) {
+      return seconds ? new Date(seconds * 1000).toLocaleString() : "—";
+    }
+
+    function renderMe(me) {
+      document.getElementById("me-badge").hidden = !me.admin;
+      const body = document.getElementById("me-body");
+      body.className = "";
+      body.innerHTML = `
+        <dl class="kv">
+          <dt>UID</dt><dd class="mono">${escapeHtml(me.uid)}</dd>
+          <dt>Email</dt><dd>${escapeHtml(me.email ?? "—")}</dd>
+          <dt>Name</dt><dd>${escapeHtml(me.name ?? "—")}</dd>
+          <dt>Signed in</dt><dd>${escapeHtml(formatTime(me.authTime))}</dd>
+        </dl>`;
+    }
+
+    function renderMeError(message) {
+      const body = document.getElementById("me-body");
+      body.className = "empty-state";
+      body.innerHTML = `
+        <span class="material-symbols-outlined">cloud_off</span>
+        ${escapeHtml(message)}`;
+    }
+
+    async function runChecks(user) {
+      ["signin", "claim", "api"].forEach((name) => setCheck(name, "pending"));
+      setCheck("signin", "ok", user.email ?? user.uid);
+
+      try {
+        const admin = await isAdmin(user, true);
+        setCheck("claim", admin ? "ok" : "fail", admin ? "admin: true" : "No admin claim");
+      } catch (err) {
+        setCheck("claim", "fail", err.message);
+      }
+
+      try {
+        const me = await api("/me");
+        setCheck("api", "ok", "GET /api/admin/me → 200");
+        renderMe(me);
+      } catch (err) {
+        const detail = `GET /api/admin/me → ${err.status ?? "network error"}`;
+        setCheck("api", "fail", detail);
+        renderMeError(err.status === 404
+          ? "The /api/admin/me route isn't there yet."
+          : err.message);
+      }
+    }
+
+    const user = await startAdminPage({ active: "dashboard", crumbs: ["Overview", "Dashboard"] });
+    document.getElementById("rerun").addEventListener("click", () => runChecks(user));
+    runChecks(user);
+  </script>
+</body>
+</html>

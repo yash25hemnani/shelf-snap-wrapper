@@ -1,0 +1,973 @@
+<!DOCTYPE html><html lang="en" style="width: 1280px; height: 100%; min-height: 100vh; overflow-x: hidden;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&amp;family=Google+Sans+Text:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Google Sans Text', 'Google Sans', -apple-system, sans-serif; background-color: #fafbfb; color: #1B2B22; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2F6B4F",
+            "primary-dark": "#1F4A36",
+            "primary-soft": "#E3EFE8",
+            "accent": "#3A6EA5",
+            "accent-soft": "#E6EEF7",
+            "secondary": "#A8842F",
+            "secondary-soft": "#FBF1DE",
+            "warning": "#C98A1B",
+            "warning-soft": "#FBF1DE",
+            "error": "#D64545",
+            "error-soft": "#FBEAEA",
+            "text-primary": "#1B2B22",
+            "text-secondary": "#5F6F66",
+            "text-hint": "#9AA8A0",
+            "border-subtle": "#E2E8E4",
+            "surface-muted": "#F4F7F5",
+            "surface-container-high": "#EBF0ED"
+          },
+          fontFamily: {
+            sans: ['"Google Sans Text"', '"Google Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafbfb] antialiased text-text-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white z-50 flex flex-col justify-between border-r border-border-subtle">
+<div class="flex flex-col">
+<!-- Brand / Header -->
+<div class="p-5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[19px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[15px] text-text-primary tracking-tight leading-tight">Admin Console</span>
+<span class="text-[11px] text-text-hint font-medium">Platform Governance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">v1.4</span>
+</div>
+<!-- Navigation -->
+<nav class="p-3.5 flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Overview</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assignment</span>
+<span>Audit Log</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Telemetry &amp; LLM</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">bolt</span>
+<span>Token Tracking</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">warning</span>
+<span>Error Log</span>
+</div>
+<span class="px-2 py-0.2 rounded-full bg-error-soft text-error font-medium text-[11px]">3 active</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Governance</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold text-[13px] bg-primary-soft text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+<span>Content &amp; Libraries</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>Remote Config</span>
+</a>
+</div>
+</nav>
+</div>
+<!-- User / Session Footer -->
+<div class="p-3.5 border-t border-border-subtle bg-white">
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-muted border border-border-subtle">
+<div class="flex items-center gap-2.5">
+<img alt="Alex Chen" class="w-8 h-8 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+<div class="flex flex-col leading-tight">
+<span class="font-semibold text-[13px] text-text-primary">Alex Chen</span>
+<span class="text-[11px] text-text-secondary">Superadmin</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-error transition-colors rounded-lg" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Shell Area -->
+<div class="pl-64 min-h-screen flex flex-col">
+<!-- Topbar -->
+<header class="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-sm border-b border-border-subtle flex items-center justify-between px-8">
+<div class="flex items-center gap-3">
+<span class="text-[13px] font-medium text-text-hint">Governance</span>
+<span class="text-text-hint text-[12px]">/</span>
+<span class="text-[13px] font-semibold text-text-primary">User Directory</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-muted text-text-secondary text-[12px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Directory Sync Active</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle text-text-primary text-[12px] font-medium hover:bg-surface-muted transition-colors">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">sync</span>
+<span>Sync</span>
+</button>
+<img alt="Alex Chen" class="w-7 h-7 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 px-8 py-6 max-w-7xl w-full mx-auto"><div class="flex flex-col w-full gap-6">
+<!-- Top Header & Action Controls Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<div class="flex flex-col gap-1 min-w-0">
+<div class="flex items-center gap-2 text-text-hint font-label-md text-label-md">
+<span>Governance</span>
+<span class="text-[10px]">›</span>
+<span class="text-primary font-semibold">Audit Log &amp; Security</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-text-primary tracking-tight">Audit Log &amp; Security Feed</h1>
+<p class="font-body-sm text-body-sm text-text-secondary max-w-2xl">
+        Chronological, tamper-evident record of administrative operations, privilege mutations, and cryptographic telemetry.
+      </p>
+</div>
+<!-- Right utility controls -->
+<div class="flex items-center flex-wrap gap-2.5">
+<!-- Live stream indicator pill -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-soft text-primary font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span class="font-medium">Live Feed: Streaming</span>
+</div>
+<!-- Date selector -->
+<button class="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-surface-muted text-text-primary font-label-md text-label-md hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">calendar_today</span>
+<span>Last 7 Days</span>
+<span class="material-symbols-outlined text-[14px] text-text-hint">expand_more</span>
+</button>
+<!-- Export button -->
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-dark transition-colors shadow-sm" onclick="triggerToast('Cryptographic audit ledger exported as CSV (SHA-256 validated)')">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>Export CSV</span>
+</button>
+</div>
+</div>
+<!-- Summary KPI Ribbon (Architectural Bento Layout) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Metric 1: Total Events -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-primary/5 group-hover:scale-110 transition-transform"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-hint uppercase tracking-wider">Total Events Today</span>
+<span class="material-symbols-outlined text-[18px] text-primary">receipt_long</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-text-primary">1,428</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">+12% vs avg</span>
+</div>
+<div class="mt-2 text-text-secondary font-body-sm text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary">trending_up</span>
+<span>Peak at 14:15 UTC (68 ops/m)</span>
+</div>
+</div>
+<!-- Metric 2: Critical Actions -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-error-soft group-hover:scale-110 transition-transform"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-hint uppercase tracking-wider">Critical Security Actions</span>
+<span class="material-symbols-outlined text-[18px] text-error">gpp_maybe</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-error">3</span>
+<span class="px-2 py-0.5 rounded-full bg-error-soft text-error font-label-sm text-label-sm font-semibold">Requires Review</span>
+</div>
+<div class="mt-2 text-text-secondary font-body-sm text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-error">security</span>
+<span>2 role promotions, 1 token flush</span>
+</div>
+</div>
+<!-- Metric 3: Active Admins -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-accent-soft group-hover:scale-110 transition-transform"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-hint uppercase tracking-wider">Active Authorized Admins</span>
+<span class="material-symbols-outlined text-[18px] text-accent">admin_panel_settings</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-text-primary">4</span>
+<span class="text-text-secondary font-body-sm text-body-sm">of 6 total operators</span>
+</div>
+<div class="mt-2 text-text-secondary font-body-sm text-body-sm flex items-center gap-1.5">
+<div class="flex -space-x-1.5">
+<span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[9px]">AC</span>
+<span class="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center font-bold text-[9px]">MV</span>
+<span class="w-5 h-5 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-[9px]">SJ</span>
+</div>
+<span class="font-mono text-[11px] text-text-hint">All 2FA Verified</span>
+</div>
+</div>
+<!-- Metric 4: Hash Integrity -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-surface-muted group-hover:scale-110 transition-transform"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-hint uppercase tracking-wider">Audit Chain Integrity</span>
+<span class="material-symbols-outlined text-[18px] text-primary">verified_user</span>
+</div>
+<div class="mt-3 flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-primary">100%</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Valid</span>
+</div>
+<div class="mt-2 text-text-secondary font-body-sm text-body-sm flex items-center gap-1.5 truncate">
+<span class="material-symbols-outlined text-[14px] text-primary">tag</span>
+<span class="font-mono text-[10px] text-text-secondary truncate">Block #488,192 · Validated 2m ago</span>
+</div>
+</div>
+</div>
+<!-- Search & Structured Filter Toolbar -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex flex-col gap-3.5">
+<div class="flex flex-col md:flex-row items-center gap-3">
+<!-- Search Input -->
+<div class="relative flex-1 w-full">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-text-hint">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-muted text-text-primary placeholder:text-text-hint font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all border-none" id="audit-search-input" oninput="handleSearch(this.value)" placeholder="Filter by admin handle, action name, target ID, SHA-256 hash or IP address..." type="text">
+</div>
+<!-- Filter Dropdowns -->
+<div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+<!-- Action Type Dropdown -->
+<select class="px-3.5 py-2.5 rounded-xl bg-surface-muted text-text-primary font-label-md text-label-md focus:ring-1 focus:ring-primary border-none cursor-pointer" id="action-filter-select" onchange="filterTable()">
+<option value="all">Action Type: All Operations</option>
+<option value="role">Role &amp; Permissions</option>
+<option value="user">User Lifecycle &amp; State</option>
+<option value="config">Remote Configs</option>
+<option value="security">Security &amp; Auth</option>
+</select>
+<!-- Severity Dropdown -->
+<select class="px-3.5 py-2.5 rounded-xl bg-surface-muted text-text-primary font-label-md text-label-md focus:ring-1 focus:ring-primary border-none cursor-pointer" id="severity-filter-select" onchange="filterTable()">
+<option value="all">Severity: All Levels</option>
+<option value="critical">Critical</option>
+<option value="warning">Warning</option>
+<option value="info">Info</option>
+</select>
+<!-- Reset Button -->
+<button class="p-2.5 rounded-xl bg-surface-muted text-text-secondary hover:text-text-primary hover:bg-surface-variant transition-colors" onclick="resetFilters()" title="Reset Filters">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</button>
+</div>
+</div>
+<!-- Quick Filter Pills -->
+<div class="flex items-center gap-2 flex-wrap pt-1">
+<span class="text-[11px] font-label-sm text-text-hint font-bold uppercase tracking-wider mr-1">Quick Select:</span>
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary hover:text-on-primary text-text-secondary font-label-md text-label-md transition-colors" onclick="applyQuickFilter('role.elevate_admin')">
+        Role Elevations
+      </button>
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary hover:text-on-primary text-text-secondary font-label-md text-label-md transition-colors" onclick="applyQuickFilter('user.suspend')">
+        Suspensions
+      </button>
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary hover:text-on-primary text-text-secondary font-label-md text-label-md transition-colors" onclick="applyQuickFilter('remote_config.update')">
+        Config Writes
+      </button>
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary hover:text-on-primary text-text-secondary font-label-md text-label-md transition-colors" onclick="applyQuickFilter('auth.session_flush')">
+        Session Revocations
+      </button>
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary hover:text-on-primary text-text-secondary font-label-md text-label-md transition-colors" onclick="applyQuickFilter('content.flag_resolved')">
+        Content Moderation
+      </button>
+</div>
+</div>
+<!-- Comprehensive Audit Log Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="audit-table">
+<thead>
+<tr class="bg-surface-muted text-text-secondary font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3.5 px-4 font-semibold">Timestamp (UTC)</th>
+<th class="py-3.5 px-4 font-semibold">Operator / Admin</th>
+<th class="py-3.5 px-4 font-semibold">Action Identifier</th>
+<th class="py-3.5 px-4 font-semibold">Target Entity</th>
+<th class="py-3.5 px-4 font-semibold">Origin &amp; IP</th>
+<th class="py-3.5 px-4 font-semibold">Severity</th>
+<th class="py-3.5 px-4 font-semibold text-right">Ledger Diff</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-muted font-body-sm text-body-sm text-text-primary" id="audit-table-body">
+<!-- Event Row 1: Role Elevation (Critical) -->
+<tr class="hover:bg-surface-muted/60 transition-colors group" data-action="role.elevate_admin" data-severity="critical" data-text="marcus vance @marcus_v role.elevate_admin user sarah jenkins 198.51.100.24">
+<td class="py-4 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-text-primary">Oct 24, 2023</span>
+<span>14:32:08 UTC</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-accent text-white flex items-center justify-center font-bold text-[10px]">MV</div>
+<div class="flex flex-col leading-tight">
+<span class="font-medium text-text-primary">Marcus Vance</span>
+<span class="font-mono text-[10px] text-text-hint">@marcus_v</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="font-mono text-[12px] font-semibold text-primary px-2 py-0.5 rounded bg-primary-soft">
+                role.elevate_admin
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-hint">person</span>
+<span class="font-medium">User: @sarah_collector</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-text-secondary">
+<div class="flex items-center gap-1">
+<span>198.51.100.24</span>
+<span class="text-text-hint">·</span>
+<span class="text-[10px] text-text-hint">US East (VA)</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full bg-error-soft text-error font-label-sm text-label-sm font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                Critical
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap text-right">
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-secondary font-label-md text-label-md transition-colors inline-flex items-center gap-1" onclick="openDiffModal('diff-1')">
+<span class="material-symbols-outlined text-[14px]">difference</span>
+<span>Inspect Diff</span>
+</button>
+</td>
+</tr>
+<!-- Event Row 2: User Suspension (Warning) -->
+<tr class="hover:bg-surface-muted/60 transition-colors group" data-action="user.suspend" data-severity="warning" data-text="alex chen @alex_c user.suspend elena rostova @elena_books 104.28.19.112">
+<td class="py-4 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-text-primary">Oct 24, 2023</span>
+<span>13:58:41 UTC</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[10px]">AC</div>
+<div class="flex flex-col leading-tight">
+<span class="font-medium text-text-primary">Alex Chen</span>
+<span class="font-mono text-[10px] text-text-hint">@alex_c</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="font-mono text-[12px] font-semibold text-warning px-2 py-0.5 rounded bg-warning-soft">
+                user.suspend
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-hint">person_off</span>
+<span class="font-medium">User: @elena_books</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-text-secondary">
+<div class="flex items-center gap-1">
+<span>104.28.19.112</span>
+<span class="text-text-hint">·</span>
+<span class="text-[10px] text-text-hint">US West (CA)</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full bg-warning-soft text-warning font-label-sm text-label-sm font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                Warning
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap text-right">
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-secondary font-label-md text-label-md transition-colors inline-flex items-center gap-1" onclick="openDiffModal('diff-2')">
+<span class="material-symbols-outlined text-[14px]">difference</span>
+<span>Inspect Diff</span>
+</button>
+</td>
+</tr>
+<!-- Event Row 3: Remote Config (Info) -->
+<tr class="hover:bg-surface-muted/60 transition-colors group" data-action="remote_config.update" data-severity="info" data-text="alex chen @alex_c remote_config.update config app build_312 groq rate_limit 104.28.19.112">
+<td class="py-4 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-text-primary">Oct 24, 2023</span>
+<span>12:14:02 UTC</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[10px]">AC</div>
+<div class="flex flex-col leading-tight">
+<span class="font-medium text-text-primary">Alex Chen</span>
+<span class="font-mono text-[10px] text-text-hint">@alex_c</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="font-mono text-[12px] font-semibold text-text-secondary px-2 py-0.5 rounded bg-surface-muted">
+                remote_config.update
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-hint">tune</span>
+<span class="font-medium">Config: app/build_312</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-text-secondary">
+<div class="flex items-center gap-1">
+<span>104.28.19.112</span>
+<span class="text-text-hint">·</span>
+<span class="text-[10px] text-text-hint">US West (CA)</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-label-sm text-label-sm font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-text-hint"></span>
+                Info
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap text-right">
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-secondary font-label-md text-label-md transition-colors inline-flex items-center gap-1" onclick="openDiffModal('diff-3')">
+<span class="material-symbols-outlined text-[14px]">difference</span>
+<span>Inspect Diff</span>
+</button>
+</td>
+</tr>
+<!-- Event Row 4: Session Flush (Critical) -->
+<tr class="hover:bg-surface-muted/60 transition-colors group" data-action="auth.session_flush" data-severity="critical" data-text="marcus vance @marcus_v auth.session_flush tokens devrim kaya @devrim_arch 198.51.100.24">
+<td class="py-4 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-text-primary">Oct 24, 2023</span>
+<span>11:22:15 UTC</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-accent text-white flex items-center justify-center font-bold text-[10px]">MV</div>
+<div class="flex flex-col leading-tight">
+<span class="font-medium text-text-primary">Marcus Vance</span>
+<span class="font-mono text-[10px] text-text-hint">@marcus_v</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="font-mono text-[12px] font-semibold text-error px-2 py-0.5 rounded bg-error-soft">
+                auth.session_flush
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-hint">key_off</span>
+<span class="font-medium">User: @devrim_arch</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-text-secondary">
+<div class="flex items-center gap-1">
+<span>198.51.100.24</span>
+<span class="text-text-hint">·</span>
+<span class="text-[10px] text-text-hint">US East (VA)</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full bg-error-soft text-error font-label-sm text-label-sm font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                Critical
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap text-right">
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-secondary font-label-md text-label-md transition-colors inline-flex items-center gap-1" onclick="openDiffModal('diff-4')">
+<span class="material-symbols-outlined text-[14px]">difference</span>
+<span>Inspect Diff</span>
+</button>
+</td>
+</tr>
+<!-- Event Row 5: Content Flag Resolved (Info) -->
+<tr class="hover:bg-surface-muted/60 transition-colors group" data-action="content.flag_resolved" data-severity="info" data-text="sarah jenkins @sarah_collector content.flag_resolved library oakridge community book isbn 9780143127741 172.56.21.89">
+<td class="py-4 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-text-primary">Oct 24, 2023</span>
+<span>09:47:30 UTC</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-[10px]">SJ</div>
+<div class="flex flex-col leading-tight">
+<span class="font-medium text-text-primary">Sarah Jenkins</span>
+<span class="font-mono text-[10px] text-text-hint">@sarah_collector</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="font-mono text-[12px] font-semibold text-text-secondary px-2 py-0.5 rounded bg-surface-muted">
+                content.flag_resolved
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-hint">local_library</span>
+<span class="font-medium">Library: Oakridge Community</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-text-secondary">
+<div class="flex items-center gap-1">
+<span>172.56.21.89</span>
+<span class="text-text-hint">·</span>
+<span class="text-[10px] text-text-hint">US Central (TX)</span>
+</div>
+</td>
+<td class="py-4 px-4 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-label-sm text-label-sm font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-text-hint"></span>
+                Info
+              </span>
+</td>
+<td class="py-4 px-4 whitespace-nowrap text-right">
+<button class="px-3 py-1 rounded-full bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-secondary font-label-md text-label-md transition-colors inline-flex items-center gap-1" onclick="openDiffModal('diff-5')">
+<span class="material-symbols-outlined text-[14px]">difference</span>
+<span>Inspect Diff</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination & SHA-256 Ledger Footnote -->
+<div class="px-5 py-3.5 bg-surface-muted flex flex-col sm:flex-row items-center justify-between gap-3 font-body-sm text-body-sm text-text-secondary">
+<div class="flex items-center gap-2 font-mono text-[11px]">
+<span class="material-symbols-outlined text-[16px] text-primary">link</span>
+<span>Latest Root Hash: <span class="text-text-primary font-bold">e7a9b0c2...91d8f1e4</span></span>
+<button class="text-primary hover:underline ml-1 font-sans" onclick="triggerToast('Cryptographic chain verified against consensus notarization')">Verify Chain</button>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-text-hint font-label-sm text-label-sm">Showing 5 of 1,428 events</span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded bg-surface-container-lowest text-text-hint hover:text-text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="p-1 rounded bg-surface-container-lowest text-text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Inline Diff / Inspector Card (Embedded Visual Preview of Event Diff) -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-col gap-5">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">find_in_page</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h3 class="font-title-md text-title-md text-text-primary">State Transition Inspector</h3>
+<span class="px-2 py-0.5 rounded-full bg-error-soft text-error font-label-sm text-label-sm font-semibold">Active Diff: Event #488,192</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary">Operation: <code class="font-mono text-primary font-semibold">role.elevate_admin</code> performed on <span class="font-medium text-text-primary">Sarah Jenkins (@sarah_collector)</span></p>
+</div>
+</div>
+<!-- Action buttons -->
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-1.5 rounded-full bg-surface-muted hover:bg-surface-variant text-text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5" onclick="triggerToast('Session signatures and MFA attestation re-verified')">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Verify MFA Attestation</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-error-soft hover:bg-error/20 text-error font-label-md text-label-md transition-colors flex items-center gap-1.5" onclick="triggerToast('Rollback ticket queued for peer-consensus')">
+<span class="material-symbols-outlined text-[16px]">undo</span>
+<span>Initiate Rollback</span>
+</button>
+</div>
+</div>
+<!-- Session Telemetry Metadata Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-xl bg-surface-muted font-body-sm text-body-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-hint uppercase">Operator Session ID</span>
+<span class="font-mono text-[11px] text-text-primary mt-0.5 truncate">sess_01HA89QXMR739B</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-hint uppercase">Authentication Method</span>
+<span class="font-medium text-primary mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">key</span>
+          FIDO2 WebAuthn (YubiKey 5C)
+        </span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-hint uppercase">Origin User-Agent</span>
+<span class="font-mono text-[11px] text-text-secondary mt-0.5 truncate">Mozilla/5.0 (macOS; arm64) Chrome/118</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-hint uppercase">Prev Block Hash</span>
+<span class="font-mono text-[11px] text-text-hint mt-0.5 truncate">a93f412d...01bc77a2</span>
+</div>
+</div>
+<!-- Side-by-Side JSON Diff Box -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Prior State (Before) -->
+<div class="flex flex-col rounded-xl bg-surface-muted overflow-hidden">
+<div class="px-4 py-2 bg-surface-variant flex items-center justify-between font-label-md text-label-md font-semibold text-text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-error">remove_circle</span>
+<span>Prior State (Before Mutation)</span>
+</div>
+<span class="font-mono text-[11px] text-text-hint">v1.2.9</span>
+</div>
+<pre class="p-4 font-mono text-[12px] leading-relaxed text-text-secondary overflow-x-auto"><code>{
+  "user_id": "usr_9982410a",
+  "handle": "@sarah_collector",
+  "role": "Curator",
+  "scopes": [
+    "library.manage_assigned",
+    "isbn.scan_unlimited",
+    "content.flag_items"
+  ],
+  "claims": {
+    <span class="bg-error-soft text-error px-1 rounded">"admin_console": false,</span>
+    <span class="bg-error-soft text-error px-1 rounded">"can_mutate_roles": false,</span>
+    "audit_exempt": false
+  },
+  "max_tokens_day": 100000
+}</code></pre>
+</div>
+<!-- Mutated State (After) -->
+<div class="flex flex-col rounded-xl bg-surface-muted overflow-hidden">
+<div class="px-4 py-2 bg-surface-variant flex items-center justify-between font-label-md text-label-md font-semibold text-text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">add_circle</span>
+<span>Mutated State (After Event)</span>
+</div>
+<span class="font-mono text-[11px] text-primary font-bold">v1.3.0</span>
+</div>
+<pre class="p-4 font-mono text-[12px] leading-relaxed text-text-primary overflow-x-auto"><code>{
+  "user_id": "usr_9982410a",
+  "handle": "@sarah_collector",
+  "role": "Admin",
+  "scopes": [
+    "library.manage_assigned",
+    "isbn.scan_unlimited",
+    "content.flag_items",
+    <span class="bg-primary-soft text-primary font-semibold px-1 rounded">"admin.governance_read",</span>
+    <span class="bg-primary-soft text-primary font-semibold px-1 rounded">"admin.library_assign"</span>
+  ],
+  "claims": {
+    <span class="bg-primary-soft text-primary font-semibold px-1 rounded">"admin_console": true,</span>
+    <span class="bg-primary-soft text-primary font-semibold px-1 rounded">"can_mutate_roles": false,</span>
+    "audit_exempt": false
+  },
+  "max_tokens_day": 500000
+}</code></pre>
+</div>
+</div>
+</div>
+<!-- Toast Notification Capsule for Micro-interactions -->
+<div class="fixed bottom-6 right-8 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2.5 px-4 py-3 rounded-full bg-text-primary text-white shadow-xl font-label-md text-label-md" id="toast-banner">
+<span class="material-symbols-outlined text-primary-fixed text-[18px]">info</span>
+<span id="toast-msg">Notification message</span>
+<button class="ml-2 hover:text-text-hint" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<script>
+    function triggerToast(message) {
+      const banner = document.getElementById('toast-banner');
+      const msg = document.getElementById('toast-msg');
+      if (!banner || !msg) return;
+      msg.textContent = message;
+      banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      banner.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        banner.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    function dismissToast() {
+      const banner = document.getElementById('toast-banner');
+      if (banner) {
+        banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        banner.classList.remove('translate-y-0', 'opacity-100');
+      }
+    }
+
+    function handleSearch(query) {
+      const val = query.toLowerCase().trim();
+      const rows = document.querySelectorAll('#audit-table-body tr');
+      rows.forEach(row => {
+        const text = row.getAttribute('data-text') || '';
+        if (text.toLowerCase().includes(val) || val === '') {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function filterTable() {
+      const actionType = document.getElementById('action-filter-select').value;
+      const severity = document.getElementById('severity-filter-select').value;
+      const rows = document.querySelectorAll('#audit-table-body tr');
+
+      rows.forEach(row => {
+        const rowAction = row.getAttribute('data-action') || '';
+        const rowSev = row.getAttribute('data-severity') || '';
+
+        let matchAction = (actionType === 'all');
+        if (!matchAction) {
+          if (actionType === 'role' && rowAction.startsWith('role.')) matchAction = true;
+          if (actionType === 'user' && rowAction.startsWith('user.')) matchAction = true;
+          if (actionType === 'config' && rowAction.startsWith('remote_config.')) matchAction = true;
+          if (actionType === 'security' && (rowAction.startsWith('auth.') || rowSev === 'critical')) matchAction = true;
+        }
+
+        let matchSev = (severity === 'all' || rowSev === severity);
+
+        if (matchAction && matchSev) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function applyQuickFilter(actionName) {
+      const rows = document.querySelectorAll('#audit-table-body tr');
+      rows.forEach(row => {
+        if (row.getAttribute('data-action') === actionName) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      triggerToast(`Filtered by action: ${actionName}`);
+    }
+
+    function resetFilters() {
+      document.getElementById('audit-search-input').value = '';
+      document.getElementById('action-filter-select').value = 'all';
+      document.getElementById('severity-filter-select').value = 'all';
+      const rows = document.querySelectorAll('#audit-table-body tr');
+      rows.forEach(row => row.style.display = '');
+      triggerToast('All filters reset');
+    }
+
+    function openDiffModal(diffId) {
+      triggerToast('Loaded diff into inspector: Event ' + diffId);
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</div></main>
+</div>
+<!-- Interactive JS -->
+<script>
+  let currentSelected = 'sarah';
+  let isSuspended = false;
+
+  const userData = {
+    sarah: {
+      name: 'Sarah Jenkins',
+      handle: '@sarah_collector',
+      avatar: 'SJ',
+      role: 'Admin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '4,218,940',
+      scans: '1,420'
+    },
+    marcus: {
+      name: 'Marcus Vance',
+      handle: '@marcus_v',
+      avatar: 'MV',
+      role: 'Superadmin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '11,840,120',
+      scans: '5,890'
+    },
+    elena: {
+      name: 'Elena Rostova',
+      handle: '@elena_books',
+      avatar: 'ER',
+      role: 'Member',
+      isAdmin: false,
+      suspended: true,
+      tokens: '840,190',
+      scans: '312'
+    },
+    tobias: {
+      name: 'Tobias Sterling',
+      handle: '@tobias_lit',
+      avatar: 'TS',
+      role: 'Curator',
+      isAdmin: false,
+      suspended: false,
+      tokens: '2,104,300',
+      scans: '945'
+    },
+    maya: {
+      name: 'Maya Lin',
+      handle: '@mayalib',
+      avatar: 'ML',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '6,712,400',
+      scans: '2,880'
+    },
+    devrim: {
+      name: 'Devrim Kaya',
+      handle: '@devrim_arch',
+      avatar: 'DK',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '320,110',
+      scans: '140'
+    }
+  };
+
+  function selectUser(key) {
+    currentSelected = key;
+    const data = userData[key];
+    if (!data) return;
+
+    document.querySelectorAll('.user-row').forEach(row => {
+      row.classList.remove('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspect';
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-text-secondary');
+      }
+    });
+
+    const selectedRow = document.getElementById('row-' + key);
+    if (selectedRow) {
+      selectedRow.classList.add('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = selectedRow.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspecting';
+        btn.classList.add('text-primary');
+        btn.classList.remove('text-text-secondary');
+      }
+    }
+
+    // Update inspector
+    document.getElementById('inspector-name').textContent = data.name;
+    document.getElementById('inspector-handle').textContent = data.handle;
+    document.getElementById('inspector-avatar').textContent = data.avatar;
+    document.getElementById('inspector-badge').textContent = data.role;
+    document.getElementById('metric-tokens').textContent = data.tokens;
+    document.getElementById('metric-scans').textContent = data.scans;
+
+    const adminToggle = document.getElementById('admin-claim-toggle');
+    if (adminToggle) {
+      adminToggle.checked = data.isAdmin;
+    }
+
+    isSuspended = data.suspended;
+    updateSuspendButtonState();
+
+    triggerToast(`Viewing record for ${data.name}`);
+  }
+
+  function toggleAdminClaim(checkbox) {
+    const targetUser = userData[currentSelected];
+    if (!targetUser) return;
+    targetUser.isAdmin = checkbox.checked;
+    targetUser.role = checkbox.checked ? 'Admin' : 'Member';
+    document.getElementById('inspector-badge').textContent = targetUser.role;
+    triggerToast(`Admin privilege ${checkbox.checked ? 'granted to' : 'revoked from'} ${targetUser.name}`);
+  }
+
+  function handleRevokeTokens() {
+    const data = userData[currentSelected];
+    triggerToast(`Active sessions revoked for ${data.handle}`);
+  }
+
+  function handleToggleSuspend() {
+    isSuspended = !isSuspended;
+    userData[currentSelected].suspended = isSuspended;
+    updateSuspendButtonState();
+    triggerToast(isSuspended ? `Account suspended for ${userData[currentSelected].name}` : `Account reactivated for ${userData[currentSelected].name}`);
+  }
+
+  function updateSuspendButtonState() {
+    const label = document.getElementById('suspend-label');
+    const btn = document.getElementById('suspend-btn');
+    if (isSuspended) {
+      label.textContent = 'Reactivate User Account';
+      btn.classList.remove('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.add('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    } else {
+      label.textContent = 'Suspend User Account';
+      btn.classList.add('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.remove('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    }
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('user-search-input');
+    if (input) input.value = '';
+    selectUser('sarah');
+    triggerToast('Filters reset to default');
+  }
+
+  let toastTimeout;
+  function triggerToast(message) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = message;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script>
+<!-- Slide-over Drawer / Sheet Overlay -->
+
+
+</body></html>
