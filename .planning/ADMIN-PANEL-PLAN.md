@@ -10,6 +10,28 @@ Built on the wrapper (Express 5 + TypeScript + firebase-admin).
   - Each page then fetches with the token, and the server checks the claim again on every call.
 - **Firestore rules stay as they are.** The new collections are written only by the wrapper through the admin SDK, so the rules deny clients completely. The one exception is `config/app`, which signed-in users can read.
 
+## Library access levels
+
+Libraries have an `access` field with one of three values:
+
+| `access` | Who can see it | Web catalog (`/lib/:handle`) |
+|---|---|---|
+| `public` | Anyone. It can show up in search engines. | Yes |
+| `unlisted` | Anyone with the link. Kept out of search engines. | Yes, `noindex` |
+| `private` | Members only | Never |
+
+- A library's handle lives in `libraryHandles/{handle}` → `{ libraryId }`, and is mirrored as `handle` on the library doc.
+- Books have their own `visibility`. Non-members, including the web catalog, only see books with `visibility == "public"`, even in a public library.
+- The admin SDK skips `firestore.rules`. Any admin route that reads library data has to be behind `requireAdmin`, and must never be reused for public pages.
+
+Where this shows up in the phases:
+- **Phase 3:** the library total is split into public, unlisted and private (three `count()` queries on `access`).
+- **Phase 5:**
+  - The library list shows an access badge and can be filtered by access.
+  - Public and unlisted libraries link to their `/lib/:handle` catalog page.
+  - Admins see every book, whatever its `visibility`, and each book shows its visibility.
+  - Changing a library's access is out of scope unless added. If it is added, it has to keep `libraryHandles` in sync and be written to the audit log.
+
 ## The 6 phases
 
 ### Phase 1: Admin foundation
@@ -30,7 +52,7 @@ Built on the wrapper (Express 5 + TypeScript + firebase-admin).
 
 ### Phase 3: Dashboard
 
-- **Totals:** users, libraries, books, loans and friendships, using `count()` aggregation queries. These cost about 1 read per 1,000 docs, so no extra counter docs are needed.
+- **Totals:** users, libraries (split into public, unlisted and private), books, loans and friendships, using `count()` aggregation queries. These cost about 1 read per 1,000 docs, so no extra counter docs are needed.
 - **Trends:** last 30 days of `usageDaily` (30 reads), showing scans, searches and tokens per day.
 - **Token panel:** total tokens, average per user, average per scan, and the top 10 users by tokens.
 - **Error log page:** paged 20 at a time, with a filter by route.
@@ -50,7 +72,7 @@ Built on the wrapper (Express 5 + TypeScript + firebase-admin).
 
 ### Phase 5: Content: libraries, books, loans, friendships and reviews
 
-- **Libraries:** browse any library, see its members and roles, and page through its books.
+- **Libraries:** browse any library, whatever its access level, see its members and roles, and page through its books. Show and filter by `access`, as described in "Library access levels" above.
 - **Books:** edit bad data (title, author, ISBN, cover link, genres) and remove junk entries. Keep the library book counts correct by doing it in a transaction.
 - **Loans:** list and filter by status, and force-resolve stuck ones (returned, cancelled, lost) so the copies on the book are released.
 - **Friendships:** list pending and accepted ones and delete ghost requests.

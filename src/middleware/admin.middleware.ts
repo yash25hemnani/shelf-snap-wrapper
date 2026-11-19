@@ -1,7 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import firebaseApp from "../config/firebase";
 import { Request, Response, NextFunction } from "express";
-import { error } from "node:console";
 import { logger } from "../utils/logger";
 
 const auth = getAuth(firebaseApp);
@@ -14,7 +13,7 @@ export async function requireAdmin(
   res: Response,
   next: NextFunction,
 ) {
-  const authHeader = req.headers.authoerization as String;
+  const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({
