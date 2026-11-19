@@ -132,16 +132,7 @@ GET /wikipedia-book?title=dune&author=frank%20herbert
 `book` is `null` when no page matches. The User-Agent uses `WIKI_CONTACT`, or
 `OPENLIBRARY_CONTACT` if that isn't set.
 
-### `GET /l/:handle`
-
-A public HTML catalog for one public ShelfSnap library. It needs no login.
-
-- **Finding the library:** the handle is looked up in `libraryHandles/{handle}`. The page only shows when the library's `access` is `public` and its `handle` still matches. Otherwise it returns a 404 page.
-- **Which books:** only books with `visibility == "public"` are listed, newest first, 48 per page. `?after=<bookId>` loads the next page.
-- **Cost:** each view costs 2 reads plus the books on the page. Vercel's CDN caches pages for 5 minutes (`s-maxage`), so repeat visits cost no reads.
-- **Safety:** this route reads through the Admin SDK, so it skips `firestore.rules`. That makes the access and visibility checks in [services/catalog.service.ts](services/catalog.service.ts) what keeps private data out. All Firestore text is HTML-escaped, and the page sends a strict CSP.
-
 ## Notes
 
-- Every route except `/l/:handle` requires a valid Firebase ID token (see [middleware/auth.middleware.ts](middleware/auth.middleware.ts)). Sign in with the Firebase client SDK and send the resulting ID token as `Authorization: Bearer <token>`; the server verifies it against your Firebase project via the Admin SDK (configured in [config/firebase.ts](config/firebase.ts)).
+- Every route requires a valid Firebase ID token (see [middleware/auth.middleware.ts](middleware/auth.middleware.ts)). Sign in with the Firebase client SDK and send the resulting ID token as `Authorization: Bearer <token>`; the server verifies it against your Firebase project via the Admin SDK (configured in [config/firebase.ts](config/firebase.ts)).
 - Requests and Groq call timing are logged via [pino](https://github.com/pinojs/pino) (see [utils/logger.ts](utils/logger.ts)); HTTP request/response logging is wired up in [server.ts](server.ts) via `pino-http`.

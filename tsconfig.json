@@ -22,8 +22,7 @@
     "types/**/*.ts",
     "constants/**/*.ts",
     "config/**/*.ts",
-    "middleware/**/*.ts",
-    "views/**/*.ts"
+    "middleware/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
