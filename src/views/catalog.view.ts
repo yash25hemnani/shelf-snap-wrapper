@@ -1,4 +1,6 @@
 import {
+  ANDROID_PACKAGE,
+  APP_SCHEME,
   APP_URL,
   BANNERS,
   SOURCE_URL,
@@ -41,6 +43,7 @@ a:focus-visible, input:focus-visible { outline: 2px solid var(--primary); outlin
 .hero .wrap { position: relative; z-index: 1; width: 100%; padding-bottom: 28px; color: #fff; }
 .hero h1 { margin: 0; font-size: clamp(28px, 6vw, 44px); line-height: 1.1; letter-spacing: -0.01em; }
 .hero p { margin: 8px 0 0; max-width: 60ch; color: rgba(255,255,255,.88); }
+.hero .button { margin-top: 16px; background: #fff; color: var(--primary-dark); }
 .bar {
   display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
   justify-content: space-between; padding: 20px 0 8px;
@@ -153,6 +156,17 @@ export function renderCatalog(catalog: Catalog, nonce: string): string {
     ? `<div class="more"><a class="button ghost" href="/lib/${esc(handle)}?after=${esc(nextCursor)}">More books</a></div>`
     : "";
 
+  // Join opens the library in the app, where people ask to join. The web
+  // app's address is the default; on Android it becomes an intent link that
+  // opens the installed app and falls back to the web app without it.
+  const webJoin = `${APP_URL}/lib/${handle}`;
+  const androidJoin = `intent://lib/${handle}#Intent;scheme=${APP_SCHEME};package=${ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(webJoin)};end`;
+  const joinScript = `<script nonce="${nonce}">
+if (/Android/i.test(navigator.userAgent)) {
+  document.getElementById("join").href = ${JSON.stringify(androidJoin)};
+}
+</script>`;
+
   // Filters the books already on the page; no extra requests or reads
   const script = books.length
     ? `<script nonce="${nonce}">
@@ -179,6 +193,7 @@ export function renderCatalog(catalog: Catalog, nonce: string): string {
   <div class="wrap">
     <h1>${esc(library.name)}</h1>
     ${library.description ? `<p>${esc(library.description)}</p>` : ""}
+    <a class="button" id="join" href="${esc(webJoin)}">Join in ShelfSnap</a>
   </div>
 </header>
 <main class="wrap">
@@ -190,6 +205,7 @@ export function renderCatalog(catalog: Catalog, nonce: string): string {
   ${more}
   ${about()}
 </main>
+${joinScript}
 ${script}`;
 
   return layout(

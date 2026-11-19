@@ -12,6 +12,11 @@ export const CATALOG_CACHE_SECONDS = 300;
 export const CATALOG_STALE_SECONDS = 3600;
 
 export const APP_URL = "https://shelf-scan-28d17.web.app";
+
+// The Android app's id and link scheme, for the Join button. The app opens
+// shelfsnap://lib/{handle} on the library's page.
+export const ANDROID_PACKAGE = "com.yashhemnani.shelfsnap";
+export const APP_SCHEME = "shelfsnap";
 export const SOURCE_URL = "https://github.com/yash25hemnani/shelf-snap";
 
 // Banner keys the app stores, mapped to photos in public/catalog/
