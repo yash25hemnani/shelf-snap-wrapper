@@ -20,6 +20,8 @@ import {
   identifySpines,
   ModelsUnavailableError,
 } from "../services/vision.service";
+import { recordUsage } from "../services/usage.service";
+import { logError } from "../services/error-log.service";
 import { ScoredBook, SpineGuess } from "../types/books.types";
 
 /**
@@ -38,10 +40,11 @@ function isValidSpineGuess(value: unknown): value is SpineGuess {
 /**
  * Finds the best Google Books listing for an identified book. Returns null
  * (and logs why) if the lookup fails, finds nothing, or the best match is
- * too weak to trust.
+ * too weak to trust. Failed lookups are added to [failedQueries].
  */
 async function lookUpBook(
   { title, author }: SpineGuess,
+  failedQueries: string[],
   quotaUser?: string,
 ): Promise<ScoredBook | null> {
   const query = author ? `${title} ${author}` : title;
@@ -51,6 +54,7 @@ async function lookUpBook(
     candidates = await searchWithRetryLadder(query, quotaUser);
   } catch (err) {
     logger.warn({ query, err }, "Google Books lookup failed");
+    failedQueries.push(query);
     return null;
   }
 
@@ -170,6 +174,7 @@ export async function searchBooks(req: Request, res: Response) {
       page,
       limit,
     });
+    await recordUsage(req.user?.uid, "search");
     res.json({ books: result.books, page, limit, total: result.total });
   } catch (err) {
     logger.error(
@@ -179,6 +184,18 @@ export async function searchBooks(req: Request, res: Response) {
 
     // Open Library search failures include the HTTP status in the message.
     const throttled = err instanceof Error && err.message.endsWith("429");
+    const status = throttled ? 503 : 502;
+    await logError(
+      {
+        route: "search",
+        kind: throttled ? "throttled" : "upstream_failed",
+        status,
+        message: "Open Library search failed",
+        uid: req.user?.uid,
+        details: { title, author, genres: uniqueGenres },
+      },
+      err,
+    );
     if (throttled) {
       return res
         .status(503)
@@ -202,9 +219,21 @@ export async function searchBookByIsbn(req: Request, res: Response) {
 
   try {
     const books = await searchByIsbn(isbn);
+    await recordUsage(req.user?.uid, "isbn");
     res.json({ books });
   } catch (err) {
     logger.error({ err, isbn }, "isbn-search failed");
+    await logError(
+      {
+        route: "isbn",
+        kind: "upstream_failed",
+        status: 502,
+        message: "Open Library ISBN lookup failed",
+        uid: req.user?.uid,
+        details: { isbn },
+      },
+      err,
+    );
     res.status(502).json({ error: "Failed to reach Open Library" });
   }
 }
@@ -240,9 +269,11 @@ export async function identifyBooks(req: Request, res: Response) {
     "identify-books request received",
   );
 
+  const uid = req.user?.uid;
+
   try {
     const modelStart = Date.now();
-    const { provider, responseText } = await identifySpines({
+    const { provider, responseText, usage } = await identifySpines({
       prompt: buildPrompt({ imageWidth, imageHeight, blocks }),
       image,
       imageMimeType,
@@ -253,6 +284,10 @@ export async function identifyBooks(req: Request, res: Response) {
       "Model call completed",
     );
 
+    // The tokens are spent once the model answers, so they count even if
+    // the reply turns out to be unusable below
+    await recordUsage(uid, "scan", { provider, usage });
+
     // JSON mode guarantees syntactically valid JSON but not that it
     // matches RESPONSE_SCHEMA, so we still guard the parse and the shape.
     let parsed: { books?: unknown };
@@ -261,12 +296,30 @@ export async function identifyBooks(req: Request, res: Response) {
       parsed = JSON.parse(responseText);
     } catch (err) {
       logger.error({ provider, responseText }, "Failed to parse model response as JSON");
+      await logError({
+        route: "scan",
+        kind: "malformed_json",
+        status: 502,
+        message: "Model returned malformed JSON",
+        uid,
+        provider,
+        details: { responseText: responseText.slice(0, 300) },
+      });
       return res.status(502).json({ error: "Model returned malformed JSON" });
     }
 
     // Check if returned response has books array
     if (!Array.isArray(parsed?.books)) {
       logger.error({ provider, parsed }, "Model response had no books array");
+      await logError({
+        route: "scan",
+        kind: "no_books_array",
+        status: 502,
+        message: "Model response had no books array",
+        uid,
+        provider,
+        details: { responseText: responseText.slice(0, 300) },
+      });
       return res
         .status(502)
         .json({ error: "Model response had no books array" });
@@ -291,10 +344,23 @@ export async function identifyBooks(req: Request, res: Response) {
       );
     }
 
+    if (identified.length === 0) {
+      await logError({
+        route: "scan",
+        kind: "empty_identification",
+        status: 200,
+        message: "Model found no book spines",
+        uid,
+        provider,
+        details: { blockCount: blocks.length },
+      });
+    }
+
     // Lookups run in parallel; a failed one only drops that book.
     const lookupStart = Date.now();
+    const failedQueries: string[] = [];
     const matches = await Promise.all(
-      identified.map((guess) => lookUpBook(guess, req.user?.uid)),
+      identified.map((guess) => lookUpBook(guess, failedQueries, uid)),
     );
     const books = dedupeByTitle(
       matches.filter((m): m is ScoredBook => m !== null),
@@ -303,6 +369,19 @@ export async function identifyBooks(req: Request, res: Response) {
       { durationMs: Date.now() - lookupStart },
       "Google Books lookups completed",
     );
+
+    // One entry per scan, not per book, so an outage doesn't flood the log
+    if (failedQueries.length > 0) {
+      await logError({
+        route: "scan",
+        kind: "lookup_failed",
+        status: 200,
+        message: `${failedQueries.length} of ${identified.length} Google Books lookups failed`,
+        uid,
+        provider,
+        details: { queries: failedQueries.slice(0, 5) },
+      });
+    }
 
     logger.info(
       {
@@ -316,9 +395,26 @@ export async function identifyBooks(req: Request, res: Response) {
   } catch (err) {
     if (err instanceof ModelsUnavailableError) {
       logger.error("Groq and Gemini both unavailable");
+      await logError({
+        route: "scan",
+        kind: "models_unavailable",
+        status: 503,
+        message: "Groq and Gemini both unavailable",
+        uid,
+      });
       return res.status(503).json({ error: "Models not available" });
     }
     logger.error({ err }, "Identify books failed");
+    await logError(
+      {
+        route: "scan",
+        kind: "model_failed",
+        status: 502,
+        message: "Identify books failed",
+        uid,
+      },
+      err,
+    );
     res.status(502).json({ error: "Failed to identify books" });
   }
 }

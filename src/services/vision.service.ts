@@ -14,9 +14,21 @@ export interface VisionInput {
   systemPrompt?: string;
 }
 
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
+
 export interface VisionResult {
   provider: "groq" | "gemini";
   responseText: string;
+  usage: TokenUsage;
+}
+
+interface ModelReply {
+  responseText: string;
+  usage: TokenUsage;
 }
 
 interface GeminiResponse {
@@ -57,6 +69,11 @@ if (!GEMINI_API_KEY) {
 // No SDK retries: on a 429 or outage we switch to Gemini instead of waiting.
 const groq = new Groq({ apiKey: GROQ_API_KEY, maxRetries: 0 });
 
+// Providers sometimes leave counts out; treat a missing count as 0
+function count(value: number | null | undefined) {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
 // Groq errors that Gemini can cover: rate limits, Groq server errors and
 // network failures. Anything else (bad request, bad key) is rethrown.
 function shouldFallBack(err: unknown) {
@@ -72,7 +89,7 @@ async function callGroq({
   image,
   imageMimeType,
   systemPrompt = SYSTEM_PROMPT,
-}: VisionInput) {
+}: VisionInput): Promise<ModelReply> {
   const completion = await groq.chat.completions.create({
     model: MODEL_NAME,
     messages: [
@@ -103,7 +120,14 @@ async function callGroq({
     "Model token usage",
   );
 
-  return completion.choices[0]?.message?.content ?? "";
+  return {
+    responseText: completion.choices[0]?.message?.content ?? "",
+    usage: {
+      promptTokens: count(usage?.prompt_tokens),
+      completionTokens: count(usage?.completion_tokens),
+      totalTokens: count(usage?.total_tokens),
+    },
+  };
 }
 
 async function callGemini({
@@ -111,7 +135,7 @@ async function callGemini({
   image,
   imageMimeType,
   systemPrompt = SYSTEM_PROMPT,
-}: VisionInput) {
+}: VisionInput): Promise<ModelReply> {
   const response = await fetch(GEMINI_URL, {
     method: "POST",
     signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
@@ -157,7 +181,19 @@ async function callGemini({
   );
 
   const parts = data.candidates?.[0]?.content?.parts ?? [];
-  return parts.map((p) => p.text ?? "").join("");
+  // Gemini bills thinking tokens as output, so they count as completion here
+  const completionTokens =
+    count(usage?.candidatesTokenCount) + count(usage?.thoughtsTokenCount);
+  return {
+    responseText: parts.map((p) => p.text ?? "").join(""),
+    usage: {
+      promptTokens: count(usage?.promptTokenCount),
+      completionTokens,
+      totalTokens:
+        count(usage?.totalTokenCount) ||
+        count(usage?.promptTokenCount) + completionTokens,
+    },
+  };
 }
 
 /**
@@ -167,7 +203,7 @@ async function callGemini({
  */
 export async function identifySpines(input: VisionInput): Promise<VisionResult> {
   try {
-    return { provider: "groq", responseText: await callGroq(input) };
+    return { provider: "groq", ...(await callGroq(input)) };
   } catch (err) {
     if (!shouldFallBack(err)) throw err;
     logger.warn({ err }, "Groq unavailable, falling back to Gemini");
@@ -176,7 +212,7 @@ export async function identifySpines(input: VisionInput): Promise<VisionResult> 
   if (!GEMINI_API_KEY) throw new ModelsUnavailableError();
 
   try {
-    return { provider: "gemini", responseText: await callGemini(input) };
+    return { provider: "gemini", ...(await callGemini(input)) };
   } catch (err) {
     logger.error({ err }, "Gemini fallback failed");
     throw new ModelsUnavailableError();
