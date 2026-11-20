@@ -30,7 +30,8 @@ Where this shows up in the phases:
   - The library list shows an access badge and can be filtered by access.
   - Public and unlisted libraries link to their `/lib/:handle` catalog page.
   - Admins see every book, whatever its `visibility`, and each book shows its visibility.
-  - Changing a library's access is out of scope unless added. If it is added, it has to keep `libraryHandles` in sync and be written to the audit log.
+  - Admins can **make a library private and lock it** (`PUT /libraries/:id/lock`), from the library drawer or a report row. It sets `access: "private"` and `adminLocked: true`; `firestore.rules` keeps a locked library private and stops the app from setting or clearing the flag. Unlocking only clears the flag, so the library stays private until the owner changes it. The handle stays reserved, since the catalog never shows private libraries. Both actions go in the audit log (`library.lock`, `library.unlock`).
+  - Admins can't make a library public or unlisted (that's the owner's choice) and can't delete libraries; deleting the owner's account covers the worst cases.
 
 ## The 6 phases
 
@@ -49,6 +50,14 @@ Where this shows up in the phases:
 - **Per day:** add to `usageDaily/{yyyy-mm-dd}`, both totals and per-route counts.
 - **Errors:** the error handler writes failures (Groq errors, Google Books 503s, timeouts, empty identifications) to `errorLog`. Give it a Firestore TTL so old entries delete themselves.
 - **Averages are computed, not stored:** average tokens per user = total tokens ÷ the number of users with a usage doc, and average per scan = tokens ÷ scans.
+
+**As built:**
+- `usage/{uid}` and `usageDaily/{yyyy-mm-dd}` (UTC) share these counters: `requests`, `routes.{scan,discover,search,isbn}`, `modelCalls`, `promptTokens`, `completionTokens`, `totalTokens`, `providers.{groq,gemini}`. `usage` also has `lastUsedAt`, and `usageDaily` has `date`.
+- Tokens are counted as soon as the model answers, even if the reply is unusable afterwards. Search and ISBN only count when they succeed.
+- `errorLog` entries have `route`, `kind`, `status`, `message`, `uid`, `provider`, `details`, `createdAt` and `expiresAt` (30 days out).
+- **One-time console setup:**
+  1. TTL policy on collection group `errorLog`, field `expiresAt`.
+  2. Composite index on `errorLog` (`route` asc, `createdAt` desc) for the route filter. The Error Log page links to it the first time the filter is used.
 
 ### Phase 3: Dashboard
 
@@ -69,6 +78,20 @@ Where this shows up in the phases:
   - Disable or enable an account with `updateUser({ disabled })` and `revokeRefreshTokens`, so a disabled user is signed out within the hour.
   - Delete an account.
   - Grant or revoke admin. Block revoking the last admin, and block revoking yourself.
+
+**As built (Phases 4–6 and the Audit Log page):**
+- Deleting an account (open decision 1): removes the Auth account, `users/{uid}` and everything under it, and the `usernames` reservation. Libraries they own, loans, friendships and `usage/{uid}` stay. Admins have to be revoked before they can be deleted.
+- Revoking admin also revokes refresh tokens, so the old token stops working in the console straight away.
+- Reviews live in `users/{uid}/ratings/{readingKey}` (open decision 3). Removing one deletes the `review` field and keeps the `rating`. The Content page also lists library `reports`, with a Dismiss action.
+- Loans can be force-resolved as: returned or lost (from lent), or cancelled (from requested or approved). Lost follows the app's `markLost`.
+- Book edits rebuild `searchTokens`. `readingKey` is only rebuilt when the title or first author changes.
+- **More one-time indexes**, each linked from its page the first time that filter is used:
+  - `libraries` (access, createdAt desc)
+  - `loans` (status, requestedOn desc)
+  - `friendships` (status, createdAt desc)
+  - `adminLog` (target.type, createdAt desc)
+  - a collection-group index on `ratings` (updatedAt desc) for the Reviews tab
+- **Still to do for Phase 6:** the `config/app` read rule in `firestore.rules`, and the Flutter banner and update card.
 
 ### Phase 5: Content: libraries, books, loans, friendships and reviews
 
