@@ -21,126 +21,180 @@
         <div class="page-header">
           <div>
             <h1 class="headline-xl">Dashboard</h1>
-            <p>Totals, usage trends and the token panel arrive in Phase 3. For now this page
-              checks that sign-in, the admin claim and the admin API all work end to end.</p>
+            <p>What's in ShelfSnap right now, and how the wrapper has been used over the last 30 days.</p>
           </div>
+          <button class="btn btn-outline btn-sm" id="refresh" type="button">
+            <span class="material-symbols-outlined">refresh</span>
+            Refresh
+          </button>
         </div>
 
-        <div class="grid-2">
-          <section class="card" aria-labelledby="check-title">
-            <div class="card-header">
-              <h2 class="title-md" id="check-title">Connection check</h2>
-              <button class="btn btn-outline btn-sm" id="rerun" type="button">
-                <span class="material-symbols-outlined">refresh</span>
-                Run again
-              </button>
-            </div>
-            <ul class="check-list">
-              <li class="check-item" data-check="signin" data-state="pending">
-                <span class="material-symbols-outlined status-icon">progress_activity</span>
-                <div class="check-text">
-                  <div>Signed in with Firebase</div>
-                  <div class="check-detail"></div>
-                </div>
-              </li>
-              <li class="check-item" data-check="claim" data-state="pending">
-                <span class="material-symbols-outlined status-icon">progress_activity</span>
-                <div class="check-text">
-                  <div>Admin claim on the token</div>
-                  <div class="check-detail"></div>
-                </div>
-              </li>
-              <li class="check-item" data-check="api" data-state="pending">
-                <span class="material-symbols-outlined status-icon">progress_activity</span>
-                <div class="check-text">
-                  <div>Server accepts the token</div>
-                  <div class="check-detail mono">GET /api/admin/me</div>
-                </div>
-              </li>
-            </ul>
-          </section>
+        <div id="totals-error" hidden></div>
 
-          <section class="card" aria-labelledby="me-title">
-            <div class="card-header">
-              <h2 class="title-md" id="me-title">What the server sees</h2>
-              <span class="badge badge-primary" id="me-badge" hidden>Admin</span>
+        <section class="stat-grid" aria-label="Totals">
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">group</span>Users</div>
+            <div class="stat-value" data-total="users"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat stat-wide">
+            <div class="stat-label"><span class="material-symbols-outlined">shelves</span>Libraries</div>
+            <div class="stat-value" data-total="libraries"><span class="skeleton">0</span></div>
+            <div class="split-bar" id="access-bar" aria-hidden="true"></div>
+            <div class="split-legend" id="access-legend"></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">menu_book</span>Books</div>
+            <div class="stat-value" data-total="books"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">swap_horiz</span>Loans</div>
+            <div class="stat-value" data-total="loans"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">handshake</span>Friendships</div>
+            <div class="stat-value" data-total="friendships"><span class="skeleton">0</span></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="trend-title">
+          <div class="card-header">
+            <div>
+              <h2 class="title-md" id="trend-title">Last 30 days</h2>
+              <div class="stat-sub">Per UTC day, from the wrapper's usage counters</div>
             </div>
-            <div id="me-body" class="empty-state">
-              <span class="material-symbols-outlined">hourglass_empty</span>
-              Waiting for the check to finish.
+            <div class="segmented" role="group" aria-label="Metric">
+              <button type="button" data-metric="scans" aria-pressed="true">Scans</button>
+              <button type="button" data-metric="searches" aria-pressed="false">Searches</button>
+              <button type="button" data-metric="tokens" aria-pressed="false">Tokens</button>
             </div>
-          </section>
-        </div>
+          </div>
+          <div id="trend-chart" class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            Loading usage…
+          </div>
+          <div class="period-summary" id="trend-summary" hidden></div>
+        </section>
       </main>
     </div>
   </div>
 
   <script type="module">
     import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
-    import { isAdmin } from "/admin/js/firebase.js";
     import { api } from "/admin/js/api.js";
+    import { formatCompact, formatNumber } from "/admin/js/format.js";
+    import { renderBarChart, scansOf, searchesOf } from "/admin/js/chart.js";
 
-    const ICONS = { ok: "check_circle", fail: "cancel", pending: "progress_activity" };
+    const ACCESS = [
+      { key: "public", label: "Public", color: "var(--primary)" },
+      { key: "unlisted", label: "Unlisted", color: "var(--secondary)" },
+      { key: "private", label: "Private", color: "var(--info)" },
+    ];
 
-    function setCheck(name, state, detail) {
-      const item = document.querySelector(`[data-check="${name}"]`);
-      item.dataset.state = state;
-      item.querySelector(".status-icon").textContent = ICONS[state];
-      if (detail !== undefined) item.querySelector(".check-detail").textContent = detail;
+    const METRICS = {
+      scans: { value: scansOf, unit: "scans" },
+      searches: { value: searchesOf, unit: "searches" },
+      tokens: { value: (day) => day.totalTokens, unit: "tokens" },
+    };
+
+    let days = [];
+    let metric = "scans";
+
+    function errorHtml(message) {
+      return `
+        <div class="alert alert-error" style="margin-bottom:var(--gutter)">
+          <span class="material-symbols-outlined">error</span>
+          <span>${escapeHtml(message)}</span>
+        </div>`;
     }
 
-    function formatTime(seconds) {
-      return seconds ? new Date(seconds * 1000).toLocaleString() : "—";
+    function setTotal(name, value) {
+      document.querySelector(`[data-total="${name}"]`).textContent = formatNumber(value);
     }
 
-    function renderMe(me) {
-      document.getElementById("me-badge").hidden = !me.admin;
-      const body = document.getElementById("me-body");
-      body.className = "";
-      body.innerHTML = `
-        <dl class="kv">
-          <dt>UID</dt><dd class="mono">${escapeHtml(me.uid)}</dd>
-          <dt>Email</dt><dd>${escapeHtml(me.email ?? "—")}</dd>
-          <dt>Name</dt><dd>${escapeHtml(me.name ?? "—")}</dd>
-          <dt>Signed in</dt><dd>${escapeHtml(formatTime(me.authTime))}</dd>
-        </dl>`;
+    function renderTotals(totals) {
+      setTotal("users", totals.users);
+      setTotal("libraries", totals.libraries.total);
+      setTotal("books", totals.books);
+      setTotal("loans", totals.loans);
+      setTotal("friendships", totals.friendships);
+
+      const total = totals.libraries.total || 1;
+      document.getElementById("access-bar").innerHTML = ACCESS.map((a) =>
+        `<span style="width:${(totals.libraries[a.key] / total) * 100}%;background:${a.color}"></span>`,
+      ).join("");
+      document.getElementById("access-legend").innerHTML = ACCESS.map((a) =>
+        `<span><i style="background:${a.color}"></i>${a.label} ${formatNumber(totals.libraries[a.key])}</span>`,
+      ).join("");
     }
 
-    function renderMeError(message) {
-      const body = document.getElementById("me-body");
-      body.className = "empty-state";
-      body.innerHTML = `
-        <span class="material-symbols-outlined">cloud_off</span>
-        ${escapeHtml(message)}`;
+    function renderTrend() {
+      const { value, unit } = METRICS[metric];
+      const chart = document.getElementById("trend-chart");
+      chart.className = "";
+      renderBarChart(chart, days.map((d) => ({ date: d.date, value: value(d) })), { unit });
     }
 
-    async function runChecks(user) {
-      ["signin", "claim", "api"].forEach((name) => setCheck(name, "pending"));
-      setCheck("signin", "ok", user.email ?? user.uid);
+    function renderSummary() {
+      const sum = (fn) => days.reduce((n, d) => n + fn(d), 0);
+      const scans = sum(scansOf);
+      const tokens = sum((d) => d.totalTokens);
+      const items = [
+        ["Scans", formatNumber(scans)],
+        ["Searches", formatNumber(sum(searchesOf))],
+        ["Tokens", formatCompact(tokens)],
+        ["Tokens per scan", formatNumber(scans ? Math.round(tokens / scans) : 0)],
+        ["Gemini fallbacks", formatNumber(sum((d) => d.providers.gemini ?? 0))],
+      ];
+      const el = document.getElementById("trend-summary");
+      el.hidden = false;
+      el.innerHTML = items.map(([label, value]) =>
+        `<div><strong>${value}</strong><span>${label}</span></div>`).join("");
+    }
 
+    async function loadTotals() {
+      const errorEl = document.getElementById("totals-error");
+      errorEl.hidden = true;
       try {
-        const admin = await isAdmin(user, true);
-        setCheck("claim", admin ? "ok" : "fail", admin ? "admin: true" : "No admin claim");
+        renderTotals(await api("/stats"));
       } catch (err) {
-        setCheck("claim", "fail", err.message);
-      }
-
-      try {
-        const me = await api("/me");
-        setCheck("api", "ok", "GET /api/admin/me → 200");
-        renderMe(me);
-      } catch (err) {
-        const detail = `GET /api/admin/me → ${err.status ?? "network error"}`;
-        setCheck("api", "fail", detail);
-        renderMeError(err.status === 404
-          ? "The /api/admin/me route isn't there yet."
-          : err.message);
+        errorEl.hidden = false;
+        errorEl.innerHTML = errorHtml(`Couldn't load totals: ${err.message}`);
       }
     }
 
-    const user = await startAdminPage({ active: "dashboard", crumbs: ["Overview", "Dashboard"] });
-    document.getElementById("rerun").addEventListener("click", () => runChecks(user));
-    runChecks(user);
+    async function loadTrend() {
+      try {
+        ({ days } = await api("/usage/daily?days=30"));
+        renderTrend();
+        renderSummary();
+      } catch (err) {
+        const chart = document.getElementById("trend-chart");
+        chart.className = "empty-state";
+        chart.innerHTML = `
+          <span class="material-symbols-outlined">cloud_off</span>
+          ${escapeHtml(`Couldn't load usage: ${err.message}`)}`;
+      }
+    }
+
+    document.querySelectorAll("[data-metric]").forEach((button) => {
+      button.addEventListener("click", () => {
+        metric = button.dataset.metric;
+        document.querySelectorAll("[data-metric]").forEach((b) =>
+          b.setAttribute("aria-pressed", String(b === button)));
+        if (days.length) renderTrend();
+      });
+    });
+
+    await startAdminPage({ active: "dashboard", crumbs: ["Overview", "Dashboard"] });
+
+    const refresh = document.getElementById("refresh");
+    refresh.addEventListener("click", async () => {
+      refresh.disabled = true;
+      await Promise.all([loadTotals(), loadTrend()]);
+      refresh.disabled = false;
+    });
+    loadTotals();
+    loadTrend();
   </script>
 </body>
 </html>

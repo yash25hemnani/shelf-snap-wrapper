@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Log · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Audit Log</h1>
+            <p>Every change an admin made from this console or the grant-admin script, newest first,
+              with what it was before.</p>
+          </div>
+        </div>
+
+        <section class="card" aria-labelledby="feed-title">
+          <div class="toolbar">
+            <h2 class="sr-only" id="feed-title">Changes</h2>
+            <div class="chips" role="group" aria-label="Filter by what changed" id="filters">
+              <button class="chip" type="button" data-filter="" aria-pressed="true">All</button>
+              <button class="chip" type="button" data-filter="user" aria-pressed="false">Users</button>
+              <button class="chip" type="button" data-filter="book" aria-pressed="false">Books</button>
+              <button class="chip" type="button" data-filter="loan" aria-pressed="false">Loans</button>
+              <button class="chip" type="button" data-filter="friendship" aria-pressed="false">Friendships</button>
+              <button class="chip" type="button" data-filter="library" aria-pressed="false">Reports</button>
+              <button class="chip" type="button" data-filter="review" aria-pressed="false">Reviews</button>
+              <button class="chip" type="button" data-filter="config" aria-pressed="false">App config</button>
+            </div>
+          </div>
+          <div id="feed-body"></div>
+          <div class="load-more" id="load-more" hidden>
+            <button class="btn btn-outline btn-sm" type="button">Load 25 more</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatDateTime, formatRelative } from "/admin/js/format.js";
+    import { chipFilter, emptyHtml, icon, pagedList } from "/admin/js/ui.js";
+
+    // What each action reads as, its icon, and its tone
+    const ACTIONS = {
+      "admin.grant": ["granted admin access to", "shield_person", "grant"],
+      "admin.revoke": ["revoked admin access from", "remove_moderator", "danger"],
+      "user.rename": ["changed the username of", "badge", "edit"],
+      "user.clearName": ["cleared the display name of", "badge", "edit"],
+      "user.disable": ["disabled", "block", "danger"],
+      "user.enable": ["enabled", "check_circle", "edit"],
+      "user.delete": ["deleted the account of", "person_remove", "danger"],
+      "book.edit": ["edited the book", "edit", "edit"],
+      "book.delete": ["removed the book", "delete", "danger"],
+      "loan.resolve": ["resolved the loan", "swap_horiz", "edit"],
+      "friendship.delete": ["deleted the friendship", "link_off", "danger"],
+      "library.lock": ["made private and locked the library", "lock", "danger"],
+      "library.unlock": ["unlocked the library", "lock_open", "edit"],
+      "report.dismiss":["dismissed a report on library", "flag", "edit"],
+      "review.remove": ["removed a review", "rate_review", "danger"],
+      "config.update": ["updated the app config", "tune", "edit"],
+    };
+
+    let filter = "";
+
+    function who(entry) {
+      if (entry.adminUid === "script") return "The grant-admin script";
+      return entry.adminEmail ?? entry.adminUid;
+    }
+
+    // A readable label for what was changed
+    function targetHtml(entry) {
+      const { type, id } = entry.target;
+      const snap = entry.before ?? entry.after ?? {};
+      if (type === "user") {
+        const name = snap.username ? `@${snap.username}` : id;
+        return entry.action === "user.delete"
+          ? `<strong>${escapeHtml(name)}</strong>`
+          : `<a href="/admin/users.html#user=${encodeURIComponent(id)}">${escapeHtml(name)}</a>`;
+      }
+      if (type === "book") return `<strong>${escapeHtml(snap.title ?? id)}</strong>`;
+      if (type === "library") {
+        return `<a href="/admin/content.html#library=${encodeURIComponent(id)}">${escapeHtml(id)}</a>`;
+      }
+      if (type === "friendship" && snap.fromUsername) {
+        return `<strong>@${escapeHtml(snap.fromUsername)} and @${escapeHtml(snap.toUsername)}</strong>`;
+      }
+      if (type === "config") return "";
+      return `<span class="uid">${escapeHtml(id)}</span>`;
+    }
+
+    function show(value) {
+      if (value === null || value === undefined || value === "") return "empty";
+      if (Array.isArray(value)) return value.join(", ") || "empty";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    // Field-by-field before and after, only for fields that changed
+    function diffHtml(before, after) {
+      if (!before || !after || typeof before !== "object" || typeof after !== "object") return "";
+      const keys = [...new Set([...Object.keys(before), ...Object.keys(after)])]
+        .filter((key) => JSON.stringify(before[key]) !== JSON.stringify(after[key]));
+      if (!keys.length) return "";
+      return `<div class="diff">${keys.map((key) => `
+        <div class="diff-row">
+          <span class="key">${escapeHtml(key)}</span>
+          <span class="from">${escapeHtml(show(before[key]))}</span>
+          <span class="to">${escapeHtml(show(after[key]))}</span>
+        </div>`).join("")}</div>`;
+    }
+
+    function entryHtml(entry) {
+      const [verb, iconName, tone] = ACTIONS[entry.action] ?? [entry.action, "history", ""];
+      return `
+        <li class="feed-item">
+          <span class="feed-icon" data-tone="${tone}">${icon(iconName)}</span>
+          <div class="feed-text">
+            <p><strong>${escapeHtml(who(entry))}</strong> ${escapeHtml(verb)} ${targetHtml(entry)}</p>
+            ${diffHtml(entry.before, entry.after)}
+          </div>
+          <time class="feed-time" datetime="${escapeHtml(entry.createdAt ?? "")}"
+            title="${escapeHtml(formatDateTime(entry.createdAt))}">${escapeHtml(formatRelative(entry.createdAt))}</time>
+        </li>`;
+    }
+
+    await startAdminPage({ active: "audit-log", crumbs: ["Overview", "Audit Log"] });
+
+    const list = pagedList({
+      body: document.getElementById("feed-body"),
+      more: document.getElementById("load-more"),
+      what: "the audit log",
+      render(entries) {
+        if (!entries.length) {
+          return emptyHtml("history", filter
+            ? "No changes of this kind yet."
+            : "No admin changes yet. They show up here as soon as anyone makes one.");
+        }
+        return `<ul class="feed">${entries.map(entryHtml).join("")}</ul>`;
+      },
+      async fetchPage(after) {
+        const params = new URLSearchParams();
+        if (filter) params.set("type", filter);
+        if (after) params.set("after", after);
+        const page = await api(`/audit?${params}`);
+        return { items: page.entries, nextCursor: page.nextCursor };
+      },
+    });
+
+    chipFilter(document.getElementById("filters"), (value) => {
+      filter = value;
+      list.reload();
+    });
+    list.reload();
+  </script>
+</body>
+</html>

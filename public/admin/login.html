@@ -114,6 +114,13 @@
       attempt(() => signInWithPopup(auth, new GoogleAuthProvider()));
     });
 
+    if (new URLSearchParams(location.search).get("reason") === "rejected") {
+      showError({
+        message: "You were signed in, but the server rejected your session. Check the server log for "
+          + "\"Admin token verification failed\" to see why.",
+      });
+    }
+
     // Already signed in from an earlier visit: skip the form.
     const existing = await waitForUser();
     if (existing) await routeSignedIn(existing);

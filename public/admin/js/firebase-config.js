@@ -3,8 +3,8 @@
 // static file. Copy them from Firebase console > Project settings > Your apps
 // > Web app. Add a web app there first if the project only has Android/iOS.
 export const firebaseConfig = {
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  appId: "REPLACE_ME",
+  apiKey: "AIzaSyA4jp9jTl5KOuLaFDjqhPiGnYf8nTkRWKE",
+  authDomain: "shelf-scan-28d17.firebaseapp.com",
+  projectId: "shelf-scan-28d17",
+  appId: "1:726504803682:web:1c5d2df65a32785aba303b",
 };

@@ -1,29 +1,28 @@
 import { signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { auth, waitForUser, isAdmin } from "./firebase.js";
 
-// One entry per page. `ready: false` shows the link greyed out with a
-// "Soon" badge until that phase's page exists.
+// One entry per page, grouped the way the sidebar shows them
 const NAV = [
   {
     label: "Overview",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: "space_dashboard", href: "/admin/", ready: true },
-      { id: "audit-log", label: "Audit Log", icon: "history", href: "/admin/audit-log.html", ready: false },
+      { id: "dashboard", label: "Dashboard", icon: "space_dashboard", href: "/admin/" },
+      { id: "audit-log", label: "Audit Log", icon: "history", href: "/admin/audit-log.html" },
     ],
   },
   {
     label: "Telemetry",
     items: [
-      { id: "tokens", label: "Token Tracking", icon: "bolt", href: "/admin/tokens.html", ready: false },
-      { id: "errors", label: "Error Log", icon: "error", href: "/admin/errors.html", ready: false },
+      { id: "tokens", label: "Token Tracking", icon: "bolt", href: "/admin/tokens.html" },
+      { id: "errors", label: "Error Log", icon: "error", href: "/admin/errors.html" },
     ],
   },
   {
     label: "Governance",
     items: [
-      { id: "users", label: "User Directory", icon: "group", href: "/admin/users.html", ready: false },
-      { id: "content", label: "Content & Libraries", icon: "menu_book", href: "/admin/content.html", ready: false },
-      { id: "config", label: "Remote Config", icon: "tune", href: "/admin/config.html", ready: false },
+      { id: "users", label: "User Directory", icon: "group", href: "/admin/users.html" },
+      { id: "content", label: "Content & Libraries", icon: "menu_book", href: "/admin/content.html" },
+      { id: "config", label: "Remote Config", icon: "tune", href: "/admin/config.html" },
     ],
   },
 ];
@@ -54,11 +53,9 @@ function navHtml(active) {
       <div class="nav-group-label">${group.label}</div>
       ${group.items.map((item) => `
         <a class="nav-link" href="${item.href}"
-          ${item.id === active ? 'aria-current="page"' : ""}
-          ${item.ready ? "" : 'aria-disabled="true" tabindex="-1"'}>
+          ${item.id === active ? 'aria-current="page"' : ""}>
           <span class="material-symbols-outlined">${item.icon}</span>
           ${item.label}
-          ${item.ready ? "" : '<span class="badge badge-info">Soon</span>'}
         </a>`).join("")}
     </div>`).join("");
 }

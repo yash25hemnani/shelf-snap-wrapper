@@ -1,9 +1,11 @@
+import { signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { auth } from "./firebase.js";
 
 export class ApiError extends Error {
-  constructor(status, message) {
+  constructor(status, message, data = null) {
     super(message);
     this.status = status;
+    this.data = data;
   }
 }
 
@@ -29,12 +31,15 @@ export async function api(path, { method = "GET", body } = {}) {
   const data = await res.json().catch(() => null);
 
   if (res.status === 401) {
-    location.replace("/admin/login.html");
+    // Sign out first: the login page sends a signed-in admin straight back
+    // here, so leaving the session in place would bounce between the two.
+    await signOut(auth).catch(() => {});
+    location.replace("/admin/login.html?reason=rejected");
   } else if (res.status === 403) {
     location.replace("/admin/not-admin.html");
   }
   if (!res.ok) {
-    throw new ApiError(res.status, data?.error ?? `Request failed (${res.status})`);
+    throw new ApiError(res.status, data?.error ?? `Request failed (${res.status})`, data);
   }
   return data;
 }
