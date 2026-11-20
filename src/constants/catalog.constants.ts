@@ -19,6 +19,11 @@ export const ANDROID_PACKAGE = "com.yashhemnani.shelfsnap";
 export const APP_SCHEME = "shelfsnap";
 export const SOURCE_URL = "https://github.com/yash25hemnani/shelf-snap";
 
+// Credit in the page's bottom corner
+export const AUTHOR_NAME = "Yash Hemnani";
+export const AUTHOR_GITHUB = "https://github.com/yash25hemnani";
+export const AUTHOR_LINKEDIN = "https://www.linkedin.com/in/yash-hemnani-yh25/";
+
 // Banner keys the app stores, mapped to photos in public/catalog/
 export const BANNERS: Record<string, string> = {
   "banner-1": "/catalog/banner-1.jpg",
