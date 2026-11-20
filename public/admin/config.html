@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Remote Config · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Remote Config</h1>
+            <p>The newest app build, where to download it, and the banner on Home. The app reads
+              this when it opens, so saved changes reach everyone on their next launch.</p>
+          </div>
+        </div>
+
+        <div id="load-error"></div>
+
+        <div class="config-layout">
+          <form id="config-form" novalidate>
+            <section class="card form-section" aria-labelledby="version-title">
+              <div class="form-section-head">
+                <div>
+                  <h2 class="title-md" id="version-title">App version</h2>
+                  <p>Anyone on a lower build than the latest sees an update card that opens the
+                    download link.</p>
+                </div>
+              </div>
+              <div class="form-row-3">
+                <div class="field">
+                  <label for="latestVersion">Latest version</label>
+                  <input class="input" id="latestVersion" placeholder="1.4.0" inputmode="decimal" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="latestBuild">Latest build</label>
+                  <input class="input" id="latestBuild" placeholder="6" inputmode="numeric" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="minBuild">Minimum build</label>
+                  <input class="input" id="minBuild" placeholder="Optional" inputmode="numeric" autocomplete="off">
+                </div>
+              </div>
+              <div class="alert alert-warning" id="force-note" hidden>
+                <span class="material-symbols-outlined">warning</span>
+                <span id="force-text"></span>
+              </div>
+              <div class="field">
+                <label for="driveLink">Download link</label>
+                <input class="input" id="driveLink" type="url" placeholder="https://drive.google.com/…" autocomplete="off">
+                <span class="hint">The APK on Google Drive. Shared as "Anyone with the link".</span>
+              </div>
+            </section>
+
+            <section class="card form-section" aria-labelledby="banner-title">
+              <div class="form-section-head">
+                <div>
+                  <h2 class="title-md" id="banner-title">Announcement</h2>
+                  <p>A short note at the top of Home for everyone, until you turn it off.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="active">
+                  <span class="switch-track" aria-hidden="true"></span>
+                  <span id="active-label">Hidden</span>
+                </label>
+              </div>
+              <div class="field">
+                <label for="text">Message</label>
+                <textarea class="textarea" id="text" maxlength="400"
+                  placeholder="Scanning is slow tonight while we move servers. Back by morning."></textarea>
+                <span class="char-count" id="char-count">0 / 280</span>
+              </div>
+              <div class="field">
+                <label for="link">Link</label>
+                <input class="input" id="link" type="url" placeholder="Optional, https://…" autocomplete="off">
+              </div>
+            </section>
+
+            <div class="save-bar">
+              <span class="meta-line" id="saved-meta"></span>
+              <div class="row-actions">
+                <button class="btn btn-outline btn-sm" type="button" id="discard" disabled>Discard changes</button>
+                <button class="btn btn-primary btn-sm" type="submit" id="save" disabled>Save and publish</button>
+              </div>
+            </div>
+          </form>
+
+          <aside class="config-side" aria-label="Preview">
+            <div class="phone" aria-hidden="true">
+              <div class="phone-screen">
+                <div class="phone-bar"><span>9:41</span><span>ShelfSnap</span></div>
+                <div class="phone-title">Home</div>
+                <div class="phone-banner" id="p-banner" hidden>
+                  <strong><span class="material-symbols-outlined">campaign</span>Announcement</strong>
+                  <span id="p-banner-text"></span>
+                  <a class="phone-link" id="p-banner-link" hidden>Open link</a>
+                </div>
+                <div class="phone-update" id="p-update" hidden>
+                  <strong><span class="material-symbols-outlined">system_update</span><span id="p-update-title"></span></strong>
+                  <span class="muted" id="p-update-text"></span>
+                  <span class="btn btn-primary">Download</span>
+                </div>
+                <div class="phone-shelf"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+            <p class="phone-caption">Home on a phone running an older build, with what's in the form now.</p>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatDateTime } from "/admin/js/format.js";
+    import { alertHtml, runAction } from "/admin/js/ui.js";
+
+    const MAX_TEXT = 280;
+    const $ = (id) => document.getElementById(id);
+    const form = $("config-form");
+
+    let saved = null;
+
+    function readForm() {
+      // Anything that isn't a number goes as typed, so the server explains what's wrong
+      const n = (id) => {
+        const raw = $(id).value.trim();
+        if (!raw) return null;
+        return Number.isFinite(Number(raw)) ? Number(raw) : raw;
+      };
+      return {
+        latestVersion: $("latestVersion").value.trim() || null,
+        latestBuild: n("latestBuild"),
+        minBuild: n("minBuild"),
+        driveLink: $("driveLink").value.trim() || null,
+        announcement: {
+          text: $("text").value.trim(),
+          active: $("active").checked,
+          link: $("link").value.trim() || null,
+        },
+      };
+    }
+
+    function fillForm(config) {
+      $("latestVersion").value = config.latestVersion ?? "";
+      $("latestBuild").value = config.latestBuild ?? "";
+      $("minBuild").value = config.minBuild ?? "";
+      $("driveLink").value = config.driveLink ?? "";
+      $("text").value = config.announcement.text;
+      $("active").checked = config.announcement.active;
+      $("link").value = config.announcement.link ?? "";
+    }
+
+    const comparable = (c) => JSON.stringify([c.latestVersion, c.latestBuild, c.minBuild, c.driveLink,
+      c.announcement.text, c.announcement.active, c.announcement.link]);
+
+    function renderMeta(config) {
+      $("saved-meta").textContent = config.updatedAt
+        ? `Last saved ${formatDateTime(config.updatedAt)}`
+        : "Not saved yet. The app shows nothing until this is saved once.";
+    }
+
+    // Preview, counter, warnings and the save button all follow the form
+    function sync() {
+      const c = readForm();
+      const dirty = saved && comparable(c) !== comparable(saved);
+      $("save").disabled = !dirty;
+      $("discard").disabled = !dirty;
+
+      const count = $("text").value.trim().length;
+      $("char-count").textContent = `${count} / ${MAX_TEXT}`;
+      $("char-count").dataset.over = String(count > MAX_TEXT);
+      $("active-label").textContent = c.announcement.active ? "Showing" : "Hidden";
+
+      const forced = c.minBuild && c.latestBuild;
+      $("force-note").hidden = !forced;
+      if (forced) {
+        $("force-text").textContent = `Builds below ${c.minBuild} can't be used until they update.`;
+      }
+
+      $("p-banner").hidden = !(c.announcement.active && c.announcement.text);
+      $("p-banner-text").textContent = c.announcement.text;
+      $("p-banner-link").hidden = !c.announcement.link;
+
+      $("p-update").hidden = !c.latestBuild;
+      $("p-update-title").textContent = forced ? "Update required" : "Update available";
+      $("p-update-text").textContent = c.latestVersion
+        ? `Version ${c.latestVersion} is out.`
+        : `Build ${c.latestBuild ?? ""} is out.`;
+    }
+
+    await startAdminPage({ active: "config", crumbs: ["Governance", "Remote Config"] });
+
+    try {
+      saved = await api("/config");
+      fillForm(saved);
+      renderMeta(saved);
+    } catch (err) {
+      $("load-error").innerHTML = `<div style="margin-bottom:var(--gutter)">${alertHtml("error", "error",
+        escapeHtml(`Couldn't load the app config: ${err.message}`))}</div>`;
+    }
+    sync();
+
+    form.addEventListener("input", sync);
+    form.addEventListener("change", sync);
+
+    $("discard").addEventListener("click", () => {
+      fillForm(saved);
+      sync();
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const next = readForm();
+      const ok = await runAction($("save"), async () => {
+        saved = await api("/config", { method: "PUT", body: next });
+      }, "Saved. The app picks it up on its next launch.");
+      // On failure the form keeps what was typed, so it can be fixed
+      if (ok) {
+        fillForm(saved);
+        renderMeta(saved);
+      }
+      sync();
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (!$("save").disabled) event.preventDefault();
+    });
+  </script>
+</body>
+</html>

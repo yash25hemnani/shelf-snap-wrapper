@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Error Log · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Error Log</h1>
+            <p>Wrapper failures, newest first: model outages, unusable model replies, empty scans and
+              Open Library or Google Books errors. Entries delete themselves after 30 days.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="refresh" type="button">
+            <span class="material-symbols-outlined">refresh</span>
+            Refresh
+          </button>
+        </div>
+
+        <section class="card" aria-labelledby="log-title">
+          <div class="toolbar">
+            <h2 class="title-md" id="log-title">Entries</h2>
+            <div class="chips" role="group" aria-label="Filter by route">
+              <button class="chip" type="button" data-route="" aria-pressed="true">All</button>
+              <button class="chip" type="button" data-route="scan" aria-pressed="false">Scan</button>
+              <button class="chip" type="button" data-route="discover" aria-pressed="false">Discover</button>
+              <button class="chip" type="button" data-route="search" aria-pressed="false">Search</button>
+              <button class="chip" type="button" data-route="isbn" aria-pressed="false">ISBN</button>
+            </div>
+          </div>
+          <div id="log-body" class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            Loading…
+          </div>
+          <div class="load-more" id="load-more" hidden>
+            <button class="btn btn-outline btn-sm" type="button">Load 20 more</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatDateTime, formatRelative } from "/admin/js/format.js";
+
+    const KINDS = {
+      models_unavailable: "Models unavailable",
+      model_failed: "Model failed",
+      malformed_json: "Malformed JSON",
+      no_books_array: "No books array",
+      empty_identification: "Nothing identified",
+      lookup_failed: "Lookups failed",
+      throttled: "Throttled",
+      upstream_failed: "Open Library down",
+    };
+
+    const ROUTE_LABELS = { scan: "Scan", discover: "Discover", search: "Search", isbn: "ISBN" };
+
+    let route = "";
+    let cursor = null;
+    let entries = [];
+    // Bumped on each fresh load so a slow older response can't overwrite a newer one
+    let requestId = 0;
+
+    function statusBadge(status) {
+      if (status >= 500) return `<span class="badge badge-error">${status}</span>`;
+      return `<span class="badge badge-warning" title="The request still returned ${status}">${status}</span>`;
+    }
+
+    function rowHtml(e, i) {
+      const hasDetails = e.details || e.uid || e.provider;
+      return `
+        <tr>
+          <td class="nowrap" title="${escapeHtml(formatDateTime(e.createdAt))}">${escapeHtml(formatRelative(e.createdAt))}</td>
+          <td><span class="badge badge-accent">${escapeHtml(ROUTE_LABELS[e.route] ?? e.route)}</span></td>
+          <td class="nowrap">${escapeHtml(KINDS[e.kind] ?? e.kind)}</td>
+          <td>${statusBadge(e.status)}</td>
+          <td>${escapeHtml(e.message)}</td>
+          <td class="nowrap">${hasDetails
+            ? `<button class="row-toggle" type="button" data-row="${i}" aria-expanded="false">Details</button>`
+            : ""}</td>
+        </tr>
+        <tr class="details-row" data-details="${i}" hidden>
+          <td colspan="6">
+            <dl class="kv" style="margin-bottom:12px">
+              <dt>When</dt><dd>${escapeHtml(formatDateTime(e.createdAt))}</dd>
+              <dt>User</dt><dd class="mono">${escapeHtml(e.uid ?? "—")}</dd>
+              <dt>Provider</dt><dd>${escapeHtml(e.provider ?? "—")}</dd>
+            </dl>
+            ${e.details ? `<pre class="details">${escapeHtml(JSON.stringify(e.details, null, 2))}</pre>` : ""}
+          </td>
+        </tr>`;
+    }
+
+    function render() {
+      const body = document.getElementById("log-body");
+      if (!entries.length) {
+        body.className = "empty-state";
+        body.innerHTML = `
+          <span class="material-symbols-outlined">task_alt</span>
+          ${route ? `No ${escapeHtml(ROUTE_LABELS[route])} errors in the last 30 days.` : "No errors in the last 30 days."}`;
+        return;
+      }
+      body.className = "table-wrap";
+      body.innerHTML = `
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">When</th>
+              <th scope="col">Route</th>
+              <th scope="col">Kind</th>
+              <th scope="col">Status</th>
+              <th scope="col">Message</th>
+              <th scope="col" aria-label="Details"></th>
+            </tr>
+          </thead>
+          <tbody>${entries.map(rowHtml).join("")}</tbody>
+        </table>`;
+    }
+
+    function renderError(err) {
+      const body = document.getElementById("log-body");
+      body.className = "";
+      const indexUrl = err.data?.createIndexUrl;
+      body.innerHTML = indexUrl
+        ? `<div class="alert alert-warning">
+            <span class="material-symbols-outlined">build</span>
+            <span>Filtering by route needs a Firestore index (route, createdAt). It's a one-time setup:
+              <a href="${escapeHtml(indexUrl)}" target="_blank" rel="noopener">create the index</a>,
+              wait a few minutes for it to build, then try again.</span>
+          </div>`
+        : `<div class="alert alert-error">
+            <span class="material-symbols-outlined">error</span>
+            <span>${escapeHtml(`Couldn't load the error log: ${err.message}`)}</span>
+          </div>`;
+    }
+
+    async function load({ more = false } = {}) {
+      const id = more ? requestId : ++requestId;
+      const moreEl = document.getElementById("load-more");
+      const moreBtn = moreEl.querySelector("button");
+      if (more) moreBtn.disabled = true;
+
+      const params = new URLSearchParams();
+      if (route) params.set("route", route);
+      if (more && cursor) params.set("after", cursor);
+
+      try {
+        const page = await api(`/errors?${params}`);
+        if (id !== requestId) return;
+        entries = more ? [...entries, ...page.errors] : page.errors;
+        cursor = page.nextCursor;
+        render();
+        moreEl.hidden = !cursor;
+      } catch (err) {
+        if (id !== requestId) return;
+        if (!more) {
+          entries = [];
+          renderError(err);
+          moreEl.hidden = true;
+        }
+      } finally {
+        moreBtn.disabled = false;
+      }
+    }
+
+    document.getElementById("log-body").addEventListener("click", (event) => {
+      const toggle = event.target.closest("[data-row]");
+      if (!toggle) return;
+      const row = document.querySelector(`[data-details="${toggle.dataset.row}"]`);
+      row.hidden = !row.hidden;
+      toggle.setAttribute("aria-expanded", String(!row.hidden));
+      toggle.textContent = row.hidden ? "Details" : "Hide";
+    });
+
+    document.querySelectorAll("[data-route]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        route = chip.dataset.route;
+        document.querySelectorAll("[data-route]").forEach((c) =>
+          c.setAttribute("aria-pressed", String(c === chip)));
+        load();
+      });
+    });
+
+    document.querySelector("#load-more button").addEventListener("click", () => load({ more: true }));
+
+    await startAdminPage({ active: "errors", crumbs: ["Telemetry", "Error Log"] });
+
+    const refresh = document.getElementById("refresh");
+    refresh.addEventListener("click", async () => {
+      refresh.disabled = true;
+      await load();
+      refresh.disabled = false;
+    });
+    load();
+  </script>
+</body>
+</html>

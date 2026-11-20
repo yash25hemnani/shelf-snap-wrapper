@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Directory · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">User Directory</h1>
+            <p>Everyone with a ShelfSnap profile, newest first. Open someone to see their libraries
+              and usage, change their @username, or manage their access.</p>
+          </div>
+        </div>
+
+        <section class="card" aria-labelledby="list-title">
+          <div class="toolbar">
+            <h2 class="sr-only" id="list-title">Users</h2>
+            <label class="search">
+              <span class="material-symbols-outlined" aria-hidden="true">search</span>
+              <span class="sr-only">Search by username</span>
+              <input class="input" id="search" type="search" placeholder="Search by @username"
+                autocomplete="off" spellcheck="false" maxlength="21">
+            </label>
+            <span class="count-note" id="count-note"></span>
+          </div>
+          <div id="list-body"></div>
+          <div class="load-more" id="load-more" hidden>
+            <button class="btn btn-outline btn-sm" type="button">Load 20 more</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatCompact, formatDate, formatNumber, formatRelative } from "/admin/js/format.js";
+    import {
+      accessBadge, avatarHtml, confirmDialog, emptyHtml, icon, loadErrorHtml, openDrawer,
+      pagedList, personHtml, runAction,
+    } from "/admin/js/ui.js";
+
+    const PROVIDERS = { password: "Email and password", "google.com": "Google", "apple.com": "Apple" };
+    const ROLES = {
+      owner: '<span class="badge badge-secondary">Owner</span>',
+      editor: '<span class="badge badge-accent">Editor</span>',
+      member: '<span class="badge badge-info">Member</span>',
+    };
+
+    const me = await startAdminPage({ active: "users", crumbs: ["Governance", "User Directory"] });
+
+    let search = "";
+    let hasMore = false;
+
+    function statusHtml(u) {
+      const badges = [];
+      if (u.admin) badges.push(`<span class="badge badge-secondary">${icon("shield_person")}Admin</span>`);
+      if (u.disabled) badges.push(`<span class="badge badge-error">${icon("block")}Disabled</span>`);
+      return badges.join(" ") || '<span class="muted">Active</span>';
+    }
+
+    function renderList(users) {
+      document.getElementById("count-note").textContent = users.length
+        ? `${formatNumber(users.length)} shown${hasMore ? ", more below" : ""}`
+        : "";
+      if (!users.length) {
+        return emptyHtml("person_search", search
+          ? `No one's username starts with "${search}".`
+          : "No profiles yet. People show up here once they pick a username in the app.");
+      }
+      return `
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">User</th>
+                <th scope="col" class="hide-narrow">Email</th>
+                <th scope="col" class="hide-narrow">Joined</th>
+                <th scope="col" class="hide-narrow">Last sign-in</th>
+                <th scope="col" class="num">Tokens</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${users.map((u) => `
+                <tr data-open="${escapeHtml(u.uid)}" tabindex="0">
+                  <td>${personHtml(u)}</td>
+                  <td class="hide-narrow">${escapeHtml(u.email ?? "—")}</td>
+                  <td class="nowrap hide-narrow">${escapeHtml(formatDate(u.createdAt))}</td>
+                  <td class="nowrap hide-narrow muted">${escapeHtml(formatRelative(u.lastSignInAt))}</td>
+                  <td class="num">${formatCompact(u.totalTokens)}</td>
+                  <td class="nowrap">${statusHtml(u)}</td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    const list = pagedList({
+      body: document.getElementById("list-body"),
+      more: document.getElementById("load-more"),
+      what: "users",
+      render: renderList,
+      async fetchPage(after) {
+        const params = new URLSearchParams();
+        if (search) params.set("q", search);
+        if (after) params.set("after", after);
+        const page = await api(`/users?${params}`);
+        hasMore = Boolean(page.nextCursor);
+        return { items: page.users, nextCursor: page.nextCursor };
+      },
+    });
+
+    // ---------- Detail drawer ----------
+
+    function actionHtml(id, title, text, label, cls = "btn-outline", disabledReason = "") {
+      return `
+        <div class="action">
+          <div class="action-text">
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(disabledReason || text)}</span>
+          </div>
+          <button class="btn ${cls} btn-xs" type="button" data-action="${id}"
+            ${disabledReason ? "disabled" : ""}>${escapeHtml(label)}</button>
+        </div>`;
+    }
+
+    function detailHtml(u) {
+      const isMe = u.uid === me.uid;
+      const providers = u.providers.map((p) => PROVIDERS[p] ?? p).join(", ") || "—";
+      const owned = u.libraries.filter((l) => l.role === "owner").length;
+
+      const libraries = u.libraries.length
+        ? `<ul class="list">${u.libraries.map((l) => `
+            <li>
+              <span class="list-main">
+                <a href="/admin/content.html#library=${encodeURIComponent(l.id)}">${escapeHtml(l.name)}</a>
+                <span class="muted">${formatNumber(l.bookCount)} books</span>
+              </span>
+              <span class="list-side">${ROLES[l.role]} ${accessBadge(l.access)}</span>
+            </li>`).join("")}</ul>`
+        : '<p class="muted" style="margin:0">Not in any library.</p>';
+
+      const manage = [
+        actionHtml("rename", "Username", `Currently @${u.username ?? "none"}. Must stay unique.`,
+          "Change", "btn-outline", u.hasProfile ? "" : "No profile yet, so there's no username to change."),
+        u.name
+          ? actionHtml("clear-name", "Display name",
+              `Shows as "${u.name}". Clearing it makes the app show their @username.`, "Clear")
+          : "",
+        u.admin
+          ? actionHtml("revoke-admin", "Admin access", "Can open this console.", "Revoke",
+              "btn-outline", isMe ? "This is you. Another admin has to revoke your access." : "")
+          : actionHtml("grant-admin", "Admin access",
+              "Lets them open this console and change anything in it.", "Grant", "btn-outline",
+              u.hasAuth ? "" : "No sign-in account to grant it to."),
+        u.disabled
+          ? actionHtml("enable", "Account disabled", "They can't sign in until it's enabled again.", "Enable", "btn-primary")
+          : actionHtml("disable", "Account", "Disabling signs them out within the hour and blocks sign-in.",
+              "Disable", "btn-outline", isMe ? "You can't disable your own account." : u.hasAuth ? "" : "No sign-in account."),
+      ].join("");
+
+      const deleteReason = isMe ? "You can't delete your own account."
+        : u.admin ? "Revoke their admin access first." : "";
+
+      return `
+        <div class="drawer-hero">
+          ${avatarHtml(u, "lg")}
+          <div style="min-width:0">
+            <h3>${escapeHtml(u.username ? `@${u.username}` : u.name ?? "No profile")}</h3>
+            ${u.username && u.name ? `<div class="muted">${escapeHtml(u.name)}</div>` : ""}
+            <div class="badges">${statusHtml(u)}${isMe ? '<span class="badge badge-accent">You</span>' : ""}</div>
+          </div>
+        </div>
+
+        <dl class="kv">
+          <dt>Email</dt><dd>${escapeHtml(u.email ?? "—")}</dd>
+          <dt>Joined</dt><dd>${escapeHtml(formatDate(u.createdAt))}</dd>
+          <dt>Last sign-in</dt><dd>${escapeHtml(formatRelative(u.lastSignInAt))}</dd>
+          <dt>Signs in with</dt><dd>${escapeHtml(providers)}</dd>
+          <dt>User id</dt><dd class="uid">${escapeHtml(u.uid)}</dd>
+        </dl>
+
+        <section class="section" aria-label="Usage">
+          <h4 class="section-title">Usage
+            <span class="count-note">${u.usage?.lastUsedAt ? `last scan ${escapeHtml(formatRelative(u.usage.lastUsedAt))}` : "nothing tracked yet"}</span>
+          </h4>
+          <div class="mini-stats">
+            <div><strong>${formatNumber(u.scans)}</strong><span>Scans</span></div>
+            <div><strong>${formatCompact(u.totalTokens)}</strong><span>Tokens</span></div>
+            <div><strong>${formatNumber(u.usage?.requests ?? 0)}</strong><span>Requests</span></div>
+          </div>
+        </section>
+
+        <section class="section" aria-label="Libraries">
+          <h4 class="section-title">Libraries <span class="count-note">${formatNumber(u.libraries.length)}</span></h4>
+          ${libraries}
+        </section>
+
+        <section class="section" aria-label="Manage">
+          <h4 class="section-title">Manage</h4>
+          <div class="actions">${manage}</div>
+        </section>
+
+        <section class="section" aria-label="Delete">
+          <div class="actions actions-danger">
+            ${actionHtml("delete", "Delete account",
+              `Removes their sign-in, profile, reading logs and ratings for good.${owned ? ` The ${owned} ${owned === 1 ? "library" : "libraries"} they own stay.` : ""}`,
+              "Delete", "btn-danger-outline", deleteReason)}
+          </div>
+        </section>`;
+    }
+
+    /** Swaps the fresh copy into the list, or drops it when it's gone. */
+    function syncRow(uid, user) {
+      // A linked user may not be on the first page, or the list is still loading
+      if (!list.items.some((row) => row.uid === uid)) return;
+      const next = user
+        ? list.items.map((row) => (row.uid === uid ? { ...row, ...user } : row))
+        : list.items.filter((row) => row.uid !== uid);
+      list.update(next);
+    }
+
+    async function runUserAction(drawer, u, action, button) {
+      const name = u.username ? `@${u.username}` : "this user";
+      const path = `/users/${encodeURIComponent(u.uid)}`;
+
+      if (action === "rename") {
+        const value = await confirmDialog({
+          title: "Change username",
+          message: `<p>Their old name is freed straight away, and anyone can then claim it.</p>`,
+          confirmLabel: "Change username",
+          input: { label: "New username", value: u.username ?? "", hint: "3–20 characters: lowercase letters, numbers, . and _" },
+        });
+        if (value === null) return;
+        const ok = await runAction(button, () =>
+          api(`${path}/username`, { method: "PATCH", body: { username: value } }),
+          `Changed to @${value.replace(/^@/, "").toLowerCase()}`);
+        if (ok) await showUser(drawer, u.uid);
+        return;
+      }
+
+      const steps = {
+        "clear-name": {
+          title: "Clear display name", label: "Clear name",
+          message: `<p>"${escapeHtml(u.name)}" is removed and the app shows ${escapeHtml(name)} instead.</p>`,
+          call: () => api(`${path}/name`, { method: "DELETE" }), done: "Display name cleared",
+        },
+        "grant-admin": {
+          title: "Grant admin access", label: "Grant admin",
+          message: `<p>${escapeHtml(name)} will be able to open this console and change users, content and the app config.</p>`,
+          call: () => api(`${path}/admin`, { method: "PUT", body: { admin: true } }),
+          done: `${name} is now an admin. They need to sign in again to see it.`,
+        },
+        "revoke-admin": {
+          title: "Revoke admin access", label: "Revoke admin", danger: true,
+          message: `<p>${escapeHtml(name)} is signed out of the console straight away.</p>`,
+          call: () => api(`${path}/admin`, { method: "PUT", body: { admin: false } }),
+          done: "Admin access revoked",
+        },
+        disable: {
+          title: "Disable account", label: "Disable account", danger: true,
+          message: `<p>${escapeHtml(name)} can't sign in, and the app signs them out within the hour. Their data stays.</p>`,
+          call: () => api(`${path}/disabled`, { method: "PUT", body: { disabled: true } }),
+          done: "Account disabled",
+        },
+        enable: {
+          title: "Enable account", label: "Enable account",
+          message: `<p>${escapeHtml(name)} can sign in again.</p>`,
+          call: () => api(`${path}/disabled`, { method: "PUT", body: { disabled: false } }),
+          done: "Account enabled",
+        },
+        delete: {
+          title: "Delete account", label: "Delete account", danger: true,
+          message: `<p>This deletes ${escapeHtml(name)}'s sign-in, profile, reading logs, ratings and settings. It can't be undone.</p>
+            <p>Libraries they own, loans and friendships stay as they are.</p>`,
+          typeToConfirm: u.username ?? "delete",
+          call: () => api(path, { method: "DELETE" }),
+          done: "Account deleted",
+        },
+      };
+
+      const step = steps[action];
+      const confirmed = await confirmDialog({
+        title: step.title,
+        message: step.message,
+        confirmLabel: step.label,
+        danger: step.danger,
+        typeToConfirm: step.typeToConfirm,
+      });
+      if (!confirmed) return;
+
+      const ok = await runAction(button, step.call, step.done);
+      if (!ok) return;
+      if (action === "delete") {
+        syncRow(u.uid, null);
+        drawer.close();
+      } else {
+        await showUser(drawer, u.uid);
+      }
+    }
+
+    async function showUser(drawer, uid) {
+      try {
+        const u = await api(`/users/${encodeURIComponent(uid)}`);
+        drawer.setTitle(u.username ? `@${u.username}` : "User");
+        drawer.body.innerHTML = detailHtml(u);
+        syncRow(uid, u);
+        drawer.body.querySelectorAll("[data-action]").forEach((button) => {
+          button.addEventListener("click", () => runUserAction(drawer, u, button.dataset.action, button));
+        });
+      } catch (err) {
+        drawer.body.innerHTML = loadErrorHtml(err, "this user");
+      }
+    }
+
+    function openUser(uid) {
+      history.replaceState(null, "", `#user=${encodeURIComponent(uid)}`);
+      const drawer = openDrawer({
+        title: "User",
+        onClose: () => history.replaceState(null, "", location.pathname),
+      });
+      showUser(drawer, uid);
+    }
+
+    // ---------- Wiring ----------
+
+    const body = document.getElementById("list-body");
+    body.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-open]");
+      if (row) openUser(row.dataset.open);
+    });
+    body.addEventListener("keydown", (event) => {
+      const row = event.target.closest("[data-open]");
+      if (row && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        openUser(row.dataset.open);
+      }
+    });
+
+    let debounce;
+    document.getElementById("search").addEventListener("input", (event) => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        const next = event.target.value.trim().toLowerCase().replace(/^@/, "");
+        if (next === search) return;
+        search = next;
+        list.reload();
+      }, 300);
+    });
+
+    list.reload();
+    const linked = new URLSearchParams(location.hash.slice(1)).get("user");
+    if (linked) openUser(linked);
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>No admin access · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-stack">
+        <span class="icon-tile" style="background: var(--warning-soft); color: var(--warning)">
+          <span class="material-symbols-outlined">lock</span>
+        </span>
+        <div>
+          <h1 class="headline-sm">No admin access</h1>
+          <p class="muted" style="margin: 6px 0 0">
+            You're signed in as <strong id="who" style="color: var(--text)">…</strong>,
+            but this account isn't an admin.
+          </p>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="material-symbols-outlined">info</span>
+          <span>An existing admin can grant access from the User Directory, or run the
+            grant-admin script on the server. Then press "Check again".</span>
+        </div>
+
+        <p class="muted body-sm" id="status" role="status" hidden></p>
+
+        <button class="btn btn-primary btn-block" id="recheck" type="button">
+          <span class="material-symbols-outlined">refresh</span>
+          Check again
+        </button>
+        <button class="btn btn-outline btn-block" id="sign-out" type="button">
+          Sign in with a different account
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { auth, waitForUser, isAdmin } from "/admin/js/firebase.js";
+
+    const status = document.getElementById("status");
+    const recheck = document.getElementById("recheck");
+
+    const user = await waitForUser();
+    if (!user) location.replace("/admin/login.html");
+    document.getElementById("who").textContent = user?.email ?? "an unknown account";
+
+    recheck.addEventListener("click", async () => {
+      recheck.disabled = true;
+      status.hidden = true;
+      try {
+        if (await isAdmin(user, true)) {
+          location.replace("/admin/");
+          return;
+        }
+        status.textContent = "Still no admin claim on this account.";
+      } catch (err) {
+        status.textContent = `Couldn't refresh the token: ${err.message}`;
+      }
+      status.hidden = false;
+      recheck.disabled = false;
+    });
+
+    document.getElementById("sign-out").addEventListener("click", async () => {
+      await signOut(auth);
+      location.replace("/admin/login.html");
+    });
+  </script>
+</body>
+</html>

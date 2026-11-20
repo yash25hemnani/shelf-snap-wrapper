@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Tracking · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Token Tracking</h1>
+            <p>Vision model tokens spent by scans and discover, across Groq and the Gemini fallback.
+              Counted from when tracking went live.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="refresh" type="button">
+            <span class="material-symbols-outlined">refresh</span>
+            Refresh
+          </button>
+        </div>
+
+        <div id="summary-error" hidden></div>
+
+        <section class="stat-grid" aria-label="Token totals">
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">bolt</span>Total tokens</div>
+            <div class="stat-value" data-stat="total"><span class="skeleton">0</span></div>
+            <div class="stat-sub" data-stat="split">&nbsp;</div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">person</span>Average per user</div>
+            <div class="stat-value" data-stat="perUser"><span class="skeleton">0</span></div>
+            <div class="stat-sub" data-stat="users">&nbsp;</div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">photo_camera</span>Average per scan</div>
+            <div class="stat-value" data-stat="perScan"><span class="skeleton">0</span></div>
+            <div class="stat-sub" data-stat="calls">&nbsp;</div>
+          </div>
+        </section>
+
+        <div class="stack">
+          <section class="card" aria-labelledby="daily-title">
+            <div class="card-header">
+              <div>
+                <h2 class="title-md" id="daily-title">Tokens per day</h2>
+                <div class="stat-sub">Last 30 UTC days</div>
+              </div>
+              <div class="split-legend" id="provider-legend"></div>
+            </div>
+            <div id="daily-chart" class="empty-state">
+              <span class="material-symbols-outlined">hourglass_empty</span>
+              Loading usage…
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="top-title">
+            <div class="card-header">
+              <h2 class="title-md" id="top-title">Top 10 users by tokens</h2>
+            </div>
+            <div id="top-users" class="empty-state">
+              <span class="material-symbols-outlined">hourglass_empty</span>
+              Loading…
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatCompact, formatNumber, formatRelative } from "/admin/js/format.js";
+    import { renderBarChart } from "/admin/js/chart.js";
+
+    function setStat(name, html) {
+      document.querySelector(`[data-stat="${name}"]`).innerHTML = html;
+    }
+
+    function emptyHtml(icon, message) {
+      return `<span class="material-symbols-outlined">${icon}</span>${escapeHtml(message)}`;
+    }
+
+    function userCell(user) {
+      const primary = user.username ? `@${user.username}` : (user.name ?? "Unknown user");
+      const secondary = user.username && user.name ? user.name : null;
+      return `
+        <div class="user-cell">
+          <strong>${escapeHtml(primary)}</strong>
+          ${secondary ? `<span class="muted">${escapeHtml(secondary)}</span>` : ""}
+          <span class="mono">${escapeHtml(user.uid)}</span>
+        </div>`;
+    }
+
+    function renderSummary(s) {
+      setStat("total", formatCompact(s.totalTokens));
+      setStat("split", `${formatCompact(s.promptTokens)} prompt · ${formatCompact(s.completionTokens)} completion`);
+      setStat("perUser", formatNumber(s.avgPerUser));
+      setStat("users", `${formatNumber(s.trackedUsers)} users tracked`);
+      setStat("perScan", formatNumber(s.avgPerScan));
+      setStat("calls", `${formatNumber(s.modelCalls)} model calls`);
+
+      const el = document.getElementById("top-users");
+      if (!s.topUsers.length) {
+        el.className = "empty-state";
+        el.innerHTML = emptyHtml("bolt", "No tokens recorded yet. Run a scan in the app to see it here.");
+        return;
+      }
+      el.className = "table-wrap";
+      el.innerHTML = `
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">User</th>
+              <th scope="col" class="num">Tokens</th>
+              <th scope="col" class="num">Share</th>
+              <th scope="col" class="num">Scans</th>
+              <th scope="col" class="num">Per scan</th>
+              <th scope="col" class="num">Last used</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${s.topUsers.map((u, i) => `
+              <tr>
+                <td><span class="rank ${i === 0 ? "rank-1" : ""}">${i + 1}</span></td>
+                <td>${userCell(u)}</td>
+                <td class="num">${formatNumber(u.totalTokens)}</td>
+                <td class="num">${s.totalTokens ? ((u.totalTokens / s.totalTokens) * 100).toFixed(1) : "0.0"}%</td>
+                <td class="num">${formatNumber(u.modelCalls)}</td>
+                <td class="num">${formatNumber(u.modelCalls ? Math.round(u.totalTokens / u.modelCalls) : 0)}</td>
+                <td class="num muted">${escapeHtml(formatRelative(u.lastUsedAt))}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>`;
+    }
+
+    function renderDaily(days) {
+      const chart = document.getElementById("daily-chart");
+      chart.className = "";
+      renderBarChart(chart, days.map((d) => ({ date: d.date, value: d.totalTokens })), { unit: "tokens" });
+
+      const groq = days.reduce((n, d) => n + (d.providers.groq ?? 0), 0);
+      const gemini = days.reduce((n, d) => n + (d.providers.gemini ?? 0), 0);
+      document.getElementById("provider-legend").innerHTML = `
+        <span><i style="background:var(--primary)"></i>Groq ${formatNumber(groq)} calls</span>
+        <span><i style="background:var(--secondary)"></i>Gemini ${formatNumber(gemini)} calls</span>`;
+    }
+
+    async function loadSummary() {
+      const errorEl = document.getElementById("summary-error");
+      errorEl.hidden = true;
+      try {
+        renderSummary(await api("/usage/tokens"));
+      } catch (err) {
+        errorEl.hidden = false;
+        errorEl.innerHTML = `
+          <div class="alert alert-error" style="margin-bottom:var(--gutter)">
+            <span class="material-symbols-outlined">error</span>
+            <span>${escapeHtml(`Couldn't load token totals: ${err.message}`)}</span>
+          </div>`;
+        const el = document.getElementById("top-users");
+        el.className = "empty-state";
+        el.innerHTML = emptyHtml("cloud_off", "Couldn't load top users.");
+      }
+    }
+
+    async function loadDaily() {
+      try {
+        const { days } = await api("/usage/daily?days=30");
+        renderDaily(days);
+      } catch (err) {
+        const chart = document.getElementById("daily-chart");
+        chart.className = "empty-state";
+        chart.innerHTML = emptyHtml("cloud_off", `Couldn't load usage: ${err.message}`);
+      }
+    }
+
+    await startAdminPage({ active: "tokens", crumbs: ["Telemetry", "Token Tracking"] });
+
+    const refresh = document.getElementById("refresh");
+    refresh.addEventListener("click", async () => {
+      refresh.disabled = true;
+      await Promise.all([loadSummary(), loadDaily()]);
+      refresh.disabled = false;
+    });
+    loadSummary();
+    loadDaily();
+  </script>
+</body>
+</html>

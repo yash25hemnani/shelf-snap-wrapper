@@ -1,0 +1,651 @@
+<!DOCTYPE html><html lang="en" style="width: 1280px; height: 100%; min-height: 100vh; overflow-x: hidden;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&amp;family=Google+Sans+Text:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Google Sans Text', 'Google Sans', -apple-system, sans-serif; background-color: #fafbfb; color: #1B2B22; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2F6B4F",
+            "primary-dark": "#1F4A36",
+            "primary-soft": "#E3EFE8",
+            "accent": "#3A6EA5",
+            "accent-soft": "#E6EEF7",
+            "secondary": "#A8842F",
+            "secondary-soft": "#FBF1DE",
+            "warning": "#C98A1B",
+            "warning-soft": "#FBF1DE",
+            "error": "#D64545",
+            "error-soft": "#FBEAEA",
+            "text-primary": "#1B2B22",
+            "text-secondary": "#5F6F66",
+            "text-hint": "#9AA8A0",
+            "border-subtle": "#E2E8E4",
+            "surface-muted": "#F4F7F5",
+            "surface-container-high": "#EBF0ED"
+          },
+          fontFamily: {
+            sans: ['"Google Sans Text"', '"Google Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafbfb] antialiased text-text-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white z-50 flex flex-col justify-between border-r border-border-subtle">
+<div class="flex flex-col">
+<!-- Brand / Header -->
+<div class="p-5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[19px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[15px] text-text-primary tracking-tight leading-tight">Admin Console</span>
+<span class="text-[11px] text-text-hint font-medium">Platform Governance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">v1.4</span>
+</div>
+<!-- Navigation -->
+<nav class="p-3.5 flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Overview</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assignment</span>
+<span>Audit Log</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Telemetry &amp; LLM</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">bolt</span>
+<span>Token Tracking</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">warning</span>
+<span>Error Log</span>
+</div>
+<span class="px-2 py-0.2 rounded-full bg-error-soft text-error font-medium text-[11px]">3 active</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Governance</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold text-[13px] bg-primary-soft text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+<span>Content &amp; Libraries</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>Remote Config</span>
+</a>
+</div>
+</nav>
+</div>
+<!-- User / Session Footer -->
+<div class="p-3.5 border-t border-border-subtle bg-white">
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-muted border border-border-subtle">
+<div class="flex items-center gap-2.5">
+<img alt="Alex Chen" class="w-8 h-8 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+<div class="flex flex-col leading-tight">
+<span class="font-semibold text-[13px] text-text-primary">Alex Chen</span>
+<span class="text-[11px] text-text-secondary">Superadmin</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-error transition-colors rounded-lg" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Shell Area -->
+<div class="pl-64 min-h-screen flex flex-col">
+<!-- Topbar -->
+<header class="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-sm border-b border-border-subtle flex items-center justify-between px-8">
+<div class="flex items-center gap-3">
+<span class="text-[13px] font-medium text-text-hint">Governance</span>
+<span class="text-text-hint text-[12px]">/</span>
+<span class="text-[13px] font-semibold text-text-primary">User Directory</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-muted text-text-secondary text-[12px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Directory Sync Active</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle text-text-primary text-[12px] font-medium hover:bg-surface-muted transition-colors">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">sync</span>
+<span>Sync</span>
+</button>
+<img alt="Alex Chen" class="w-7 h-7 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8">
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 px-8 py-6 max-w-7xl w-full mx-auto">
+<!-- Header & High-Level Stats -->
+<div class="flex flex-col gap-4 mb-6">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-text-primary font-sans">User Directory</h1>
+<p class="text-text-secondary text-[14px] mt-0.5">Manage accounts, monitor usage quotas, and adjust administrative privileges.</p>
+</div>
+<div class="flex items-center gap-2.5">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white border border-border-subtle text-text-primary hover:bg-surface-muted text-[13px] font-medium transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-text-secondary">file_download</span>
+<span>Export</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark text-[13px] font-semibold transition-colors shadow-sm" onclick="triggerToast('Invite modal opened')">
+<span class="material-symbols-outlined text-[17px]">person_add</span>
+<span>+ Invite User</span>
+</button>
+</div>
+</div>
+<!-- Sleek Horizontal Minimal Stat Row -->
+<div class="flex items-center gap-6 py-2.5 px-4 bg-white border border-border-subtle rounded-xl text-[13px]">
+<div class="flex items-center gap-2">
+<span class="text-text-secondary">Total Registered:</span>
+<span class="font-semibold text-text-primary">48,290</span>
+</div>
+<div class="h-3 w-[1px] bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-text-secondary">Active Admins:</span>
+<span class="font-semibold text-text-primary">8</span>
+</div>
+<div class="h-3 w-[1px] bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-text-secondary">Suspended:</span>
+<span class="font-semibold text-text-primary">14</span>
+</div>
+<div class="h-3 w-[1px] bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<span class="text-text-secondary">Federated Libraries:</span>
+<span class="font-semibold text-text-primary">1,142</span>
+</div>
+</div>
+</div>
+<!-- Toolbar: Clean Search & Filters -->
+<div class="bg-white border border-border-subtle rounded-xl p-2.5 mb-5 shadow-sm">
+<div class="flex flex-wrap lg:flex-nowrap items-center gap-3">
+<!-- Search Input -->
+<div class="relative flex-1 min-w-[300px]">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint text-[18px]">search</span>
+<input class="w-full h-10 pl-10 pr-4 bg-surface-muted/60 border border-border-subtle rounded-lg text-[13px] text-text-primary placeholder:text-text-hint focus:outline-none focus:border-primary focus:bg-white transition-all font-sans" id="user-search-input" placeholder="Search users by name, email, or @handle..." type="text">
+</div>
+<!-- Filter Dropdowns -->
+<div class="flex items-center gap-2 flex-wrap">
+<select class="h-10 px-3 bg-white border border-border-subtle rounded-lg text-[13px] font-medium text-text-secondary hover:border-text-hint focus:outline-none focus:border-primary transition-colors cursor-pointer">
+<option value="all">All Roles</option>
+<option value="superadmin">Superadmin</option>
+<option value="admin">Admin</option>
+<option value="curator">Curator</option>
+<option value="member">Member</option>
+</select>
+<select class="h-10 px-3 bg-white border border-border-subtle rounded-lg text-[13px] font-medium text-text-secondary hover:border-text-hint focus:outline-none focus:border-primary transition-colors cursor-pointer">
+<option value="all">Status: All</option>
+<option value="active">Active</option>
+<option value="suspended">Suspended</option>
+<option value="throttled">Throttled</option>
+</select>
+<select class="h-10 px-3 bg-white border border-border-subtle rounded-lg text-[13px] font-medium text-text-secondary hover:border-text-hint focus:outline-none focus:border-primary transition-colors cursor-pointer">
+<option value="last_active">Sort by: Last Active</option>
+<option value="tokens">Sort by: Groq Tokens</option>
+<option value="scans">Sort by: AI Scans</option>
+<option value="joined">Sort by: Date Joined</option>
+</select>
+<button class="h-10 w-10 rounded-lg border border-border-subtle text-text-secondary hover:bg-surface-muted hover:text-text-primary flex items-center justify-center transition-colors" onclick="resetFilters()" title="Reset Filters">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Workspace: Table (Left ~65%) & Inspector Card (Right ~35%) -->
+<div class="w-full bg-white border border-border-subtle rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-subtle bg-surface-muted/40 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+<th class="py-3.5 px-6">User</th>
+<th class="py-3.5 px-4">Role</th>
+<th class="py-3.5 px-4">Libraries</th>
+<th class="py-3.5 px-4">Usage</th>
+<th class="py-3.5 px-4">Activity</th>
+<th class="py-3.5 px-4">Status</th>
+<th class="py-3.5 px-6 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle text-[13px]">
+<!-- Sarah Jenkins (Selected) -->
+<tr class="user-row bg-[rgba(47,107,79,0.04)] border-l-2 border-l-primary cursor-pointer hover:bg-surface-muted/50 transition-colors" id="row-sarah" onclick="selectUser('sarah')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      SJ
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Sarah Jenkins</span>
+<span class="text-[12px] text-text-hint truncate">@sarah_collector</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-soft text-primary font-medium text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Admin
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">3 hubs</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">4.2M</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">12 mins ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-soft text-primary text-[11px] font-medium">Active</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-primary bg-primary-soft/60 hover:bg-primary-soft transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+<!-- Marcus Vance -->
+<tr class="user-row hover:bg-surface-muted/60 cursor-pointer transition-colors" id="row-marcus" onclick="selectUser('marcus')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      MV
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Marcus Vance</span>
+<span class="text-[12px] text-text-hint truncate">@marcus_v</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary-soft text-secondary font-medium text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Superadmin
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">7 hubs</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">11.8M</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">4 mins ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-soft text-primary text-[11px] font-medium">Active</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+<!-- Elena Rostova -->
+<tr class="user-row hover:bg-surface-muted/60 cursor-pointer transition-colors" id="row-elena" onclick="selectUser('elena')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-error-soft text-error flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      ER
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Elena Rostova</span>
+<span class="text-[12px] text-text-hint truncate">@elena_books</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-medium text-[11px]">
+                    Member
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">1 hub</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">840K</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">18 days ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-error-soft text-error text-[11px] font-medium">Suspended</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+<!-- Tobias Sterling -->
+<tr class="user-row hover:bg-surface-muted/60 cursor-pointer transition-colors" id="row-tobias" onclick="selectUser('tobias')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-text-primary flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      TS
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Tobias Sterling</span>
+<span class="text-[12px] text-text-hint truncate">@tobias_lit</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-medium text-[11px]">
+                    Curator
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">2 hubs</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">2.1M</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">2 hours ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-soft text-primary text-[11px] font-medium">Active</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+<!-- Maya Lin -->
+<tr class="user-row hover:bg-surface-muted/60 cursor-pointer transition-colors" id="row-maya" onclick="selectUser('maya')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-warning-soft text-warning flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      ML
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Maya Lin</span>
+<span class="text-[12px] text-text-hint truncate">@mayalib</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-medium text-[11px]">
+                    Member
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">1 hub</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">6.7M</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">1 hour ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-warning-soft text-warning text-[11px] font-medium">Throttled</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+<!-- Devrim Kaya -->
+<tr class="user-row hover:bg-surface-muted/60 cursor-pointer transition-colors" id="row-devrim" onclick="selectUser('devrim')">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-full bg-surface-muted text-text-secondary flex items-center justify-center font-bold text-[13px] flex-shrink-0">
+                      DK
+                    </div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-text-primary truncate text-[14px]">Devrim Kaya</span>
+<span class="text-[12px] text-text-hint truncate">@devrim_arch</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-surface-muted text-text-secondary font-medium text-[11px]">
+                    Member
+                  </span>
+</td>
+<td class="py-4 px-4 text-text-secondary text-[13px]">1 hub</td>
+<td class="py-4 px-4 text-[13px]">
+<span class="font-semibold text-text-primary">320K</span> <span class="text-text-hint text-[12px]">tok</span>
+</td>
+<td class="py-4 px-4 text-[13px] text-text-secondary">3 days ago</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-soft text-primary text-[11px] font-medium">Active</span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">dock_to_left</span>
+<span>View Dossier</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Clean Pagination Footer -->
+<div class="px-6 py-4 bg-white border-t border-border-subtle flex items-center justify-between text-[13px] text-text-secondary">
+<span>Showing <strong class="text-text-primary font-semibold">1–6</strong> of 48,290 users</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-border-subtle bg-white text-text-hint disabled:opacity-40 hover:text-text-primary text-[12px] font-medium" disabled="">
+              Previous
+            </button>
+<span class="px-2 text-text-primary font-medium text-[12px]">Page 1 of 8,048</span>
+<button class="px-3 py-1.5 rounded-lg border border-border-subtle bg-white text-text-primary hover:bg-surface-muted text-[12px] font-medium transition-colors">
+              Next
+            </button>
+</div>
+</div>
+</div>
+<!-- Notification Toast -->
+<div class="fixed bottom-6 right-6 z-50 transform transition-all duration-300 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-text-primary text-white shadow-xl max-w-sm translate-y-20 opacity-0 pointer-events-none" id="toast-banner">
+<span class="material-symbols-outlined text-primary-soft text-[18px]">info</span>
+<span class="text-[13px] font-medium" id="toast-msg">Ready</span>
+<button class="ml-2 text-text-hint hover:text-white pointer-events-auto" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[15px] block">close</span>
+</button>
+</div>
+</main>
+</div>
+<!-- Interactive JS -->
+<script>
+  let currentSelected = 'sarah';
+  let isSuspended = false;
+
+  const userData = {
+    sarah: {
+      name: 'Sarah Jenkins',
+      handle: '@sarah_collector',
+      avatar: 'SJ',
+      role: 'Admin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '4,218,940',
+      scans: '1,420'
+    },
+    marcus: {
+      name: 'Marcus Vance',
+      handle: '@marcus_v',
+      avatar: 'MV',
+      role: 'Superadmin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '11,840,120',
+      scans: '5,890'
+    },
+    elena: {
+      name: 'Elena Rostova',
+      handle: '@elena_books',
+      avatar: 'ER',
+      role: 'Member',
+      isAdmin: false,
+      suspended: true,
+      tokens: '840,190',
+      scans: '312'
+    },
+    tobias: {
+      name: 'Tobias Sterling',
+      handle: '@tobias_lit',
+      avatar: 'TS',
+      role: 'Curator',
+      isAdmin: false,
+      suspended: false,
+      tokens: '2,104,300',
+      scans: '945'
+    },
+    maya: {
+      name: 'Maya Lin',
+      handle: '@mayalib',
+      avatar: 'ML',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '6,712,400',
+      scans: '2,880'
+    },
+    devrim: {
+      name: 'Devrim Kaya',
+      handle: '@devrim_arch',
+      avatar: 'DK',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '320,110',
+      scans: '140'
+    }
+  };
+
+  function selectUser(key) {
+    currentSelected = key;
+    const data = userData[key];
+    if (!data) return;
+
+    document.querySelectorAll('.user-row').forEach(row => {
+      row.classList.remove('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspect';
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-text-secondary');
+      }
+    });
+
+    const selectedRow = document.getElementById('row-' + key);
+    if (selectedRow) {
+      selectedRow.classList.add('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = selectedRow.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspecting';
+        btn.classList.add('text-primary');
+        btn.classList.remove('text-text-secondary');
+      }
+    }
+
+    // Update inspector
+    document.getElementById('inspector-name').textContent = data.name;
+    document.getElementById('inspector-handle').textContent = data.handle;
+    document.getElementById('inspector-avatar').textContent = data.avatar;
+    document.getElementById('inspector-badge').textContent = data.role;
+    document.getElementById('metric-tokens').textContent = data.tokens;
+    document.getElementById('metric-scans').textContent = data.scans;
+
+    const adminToggle = document.getElementById('admin-claim-toggle');
+    if (adminToggle) {
+      adminToggle.checked = data.isAdmin;
+    }
+
+    isSuspended = data.suspended;
+    updateSuspendButtonState();
+
+    triggerToast(`Viewing record for ${data.name}`);
+  }
+
+  function toggleAdminClaim(checkbox) {
+    const targetUser = userData[currentSelected];
+    if (!targetUser) return;
+    targetUser.isAdmin = checkbox.checked;
+    targetUser.role = checkbox.checked ? 'Admin' : 'Member';
+    document.getElementById('inspector-badge').textContent = targetUser.role;
+    triggerToast(`Admin privilege ${checkbox.checked ? 'granted to' : 'revoked from'} ${targetUser.name}`);
+  }
+
+  function handleRevokeTokens() {
+    const data = userData[currentSelected];
+    triggerToast(`Active sessions revoked for ${data.handle}`);
+  }
+
+  function handleToggleSuspend() {
+    isSuspended = !isSuspended;
+    userData[currentSelected].suspended = isSuspended;
+    updateSuspendButtonState();
+    triggerToast(isSuspended ? `Account suspended for ${userData[currentSelected].name}` : `Account reactivated for ${userData[currentSelected].name}`);
+  }
+
+  function updateSuspendButtonState() {
+    const label = document.getElementById('suspend-label');
+    const btn = document.getElementById('suspend-btn');
+    if (isSuspended) {
+      label.textContent = 'Reactivate User Account';
+      btn.classList.remove('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.add('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    } else {
+      label.textContent = 'Suspend User Account';
+      btn.classList.add('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.remove('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    }
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('user-search-input');
+    if (input) input.value = '';
+    selectUser('sarah');
+    triggerToast('Filters reset to default');
+  }
+
+  let toastTimeout;
+  function triggerToast(message) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = message;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script>
+<!-- Slide-over Drawer / Sheet Overlay -->
+
+
+</body></html>

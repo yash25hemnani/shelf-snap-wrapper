@@ -18,6 +18,8 @@ import {
   identifySpines,
   ModelsUnavailableError,
 } from "../services/vision.service";
+import { recordUsage } from "../services/usage.service";
+import { logError } from "../services/error-log.service";
 import {
   DiscoveredBook,
   DiscoverSpineGuess,
@@ -55,10 +57,14 @@ function toGenreNames(raw: unknown): string[] {
   return [...new Set(names)].slice(0, MAX_GENRES_PER_BOOK);
 }
 
-/** Best Google Books listing for a spine, or null if none is strong enough. */
+/**
+ * Best Google Books listing for a spine, or null if none is strong enough.
+ * Failed lookups are added to [failedQueries].
+ */
 async function lookUpBook(
   title: string,
   author: string,
+  failedQueries: string[],
   quotaUser?: string,
 ): Promise<ScoredBook | null> {
   const query = author ? `${title} ${author}` : title;
@@ -68,6 +74,7 @@ async function lookUpBook(
     candidates = await searchWithRetryLadder(query, quotaUser);
   } catch (err) {
     logger.warn({ query, err }, "Discover: Google Books lookup failed");
+    failedQueries.push(query);
     return null;
   }
 
@@ -129,9 +136,11 @@ export async function discoverBooks(req: Request, res: Response) {
     "discover request received",
   );
 
+  const uid = req.user?.uid;
+
   try {
     const modelStart = Date.now();
-    const { provider, responseText } = await identifySpines({
+    const { provider, responseText, usage } = await identifySpines({
       prompt: buildDiscoverPrompt({ imageWidth, imageHeight, blocks }),
       systemPrompt: DISCOVER_SYSTEM_PROMPT,
       image,
@@ -143,15 +152,36 @@ export async function discoverBooks(req: Request, res: Response) {
       "Discover: model call completed",
     );
 
+    // Tokens are spent once the model answers, even if the reply is unusable
+    await recordUsage(uid, "discover", { provider, usage });
+
     let parsed: { books?: unknown };
     try {
       parsed = JSON.parse(responseText);
     } catch {
       logger.error({ provider, responseText }, "Discover: malformed JSON");
+      await logError({
+        route: "discover",
+        kind: "malformed_json",
+        status: 502,
+        message: "Model returned malformed JSON",
+        uid,
+        provider,
+        details: { responseText: responseText.slice(0, 300) },
+      });
       return res.status(502).json({ error: "Model returned malformed JSON" });
     }
     if (!Array.isArray(parsed?.books)) {
       logger.error({ provider, parsed }, "Discover: no books array");
+      await logError({
+        route: "discover",
+        kind: "no_books_array",
+        status: 502,
+        message: "Model response had no books array",
+        uid,
+        provider,
+        details: { responseText: responseText.slice(0, 300) },
+      });
       return res
         .status(502)
         .json({ error: "Model response had no books array" });
@@ -172,17 +202,48 @@ export async function discoverBooks(req: Request, res: Response) {
       "Discover: model identified spines",
     );
 
+    if (identified.length === 0) {
+      await logError({
+        route: "discover",
+        kind: "empty_identification",
+        status: 200,
+        message: "Model found no book spines",
+        uid,
+        provider,
+        details: { blockCount: blocks.length },
+      });
+    }
+
     // Lookups run in parallel; a failed one only drops that book.
     const lookupStart = Date.now();
+    const failedQueries: string[] = [];
     const matches = await Promise.all(
       identified.map(async (guess): Promise<DiscoveredBook | null> => {
-        const match = await lookUpBook(guess.title, guess.author, req.user?.uid);
+        const match = await lookUpBook(
+          guess.title,
+          guess.author,
+          failedQueries,
+          uid,
+        );
         return match ? { ...match, genres: guess.genres } : null;
       }),
     );
     const books = dedupeByTitle(
       matches.filter((m): m is DiscoveredBook => m !== null),
     );
+
+    // One entry per request, not per book, so an outage doesn't flood the log
+    if (failedQueries.length > 0) {
+      await logError({
+        route: "discover",
+        kind: "lookup_failed",
+        status: 200,
+        message: `${failedQueries.length} of ${identified.length} Google Books lookups failed`,
+        uid,
+        provider,
+        details: { queries: failedQueries.slice(0, 5) },
+      });
+    }
 
     logger.info(
       {
@@ -197,9 +258,26 @@ export async function discoverBooks(req: Request, res: Response) {
   } catch (err) {
     if (err instanceof ModelsUnavailableError) {
       logger.error("Discover: Groq and Gemini both unavailable");
+      await logError({
+        route: "discover",
+        kind: "models_unavailable",
+        status: 503,
+        message: "Groq and Gemini both unavailable",
+        uid,
+      });
       return res.status(503).json({ error: "Models not available" });
     }
     logger.error({ err }, "Discover failed");
+    await logError(
+      {
+        route: "discover",
+        kind: "model_failed",
+        status: 502,
+        message: "Discover failed",
+        uid,
+      },
+      err,
+    );
     res.status(502).json({ error: "Failed to discover books" });
   }
 }

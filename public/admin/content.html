@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content & Libraries · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Content & Libraries</h1>
+            <p>Every library whatever its access, with all of its books. Fix bad book data, free
+              copies held by stuck loans, and clear out reports, ghost friend requests and reviews.</p>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Content">
+          <button class="tab" role="tab" id="tab-libraries" aria-controls="panel-libraries" data-tab="libraries">
+            <span class="material-symbols-outlined" aria-hidden="true">shelves</span>Libraries</button>
+          <button class="tab" role="tab" id="tab-loans" aria-controls="panel-loans" data-tab="loans">
+            <span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Loans</button>
+          <button class="tab" role="tab" id="tab-friendships" aria-controls="panel-friendships" data-tab="friendships">
+            <span class="material-symbols-outlined" aria-hidden="true">handshake</span>Friendships</button>
+          <button class="tab" role="tab" id="tab-reports" aria-controls="panel-reports" data-tab="reports">
+            <span class="material-symbols-outlined" aria-hidden="true">flag</span>Reports</button>
+          <button class="tab" role="tab" id="tab-reviews" aria-controls="panel-reviews" data-tab="reviews">
+            <span class="material-symbols-outlined" aria-hidden="true">rate_review</span>Reviews</button>
+        </div>
+
+        <section class="card" role="tabpanel" id="panel-libraries" aria-labelledby="tab-libraries" hidden>
+          <div class="toolbar">
+            <span class="count-note">Newest first. Open one to see its members and books.</span>
+            <div class="chips" role="group" aria-label="Filter by access" data-filters>
+              <button class="chip" type="button" data-filter="" aria-pressed="true">All</button>
+              <button class="chip" type="button" data-filter="public" aria-pressed="false">Public</button>
+              <button class="chip" type="button" data-filter="unlisted" aria-pressed="false">Unlisted</button>
+              <button class="chip" type="button" data-filter="private" aria-pressed="false">Private</button>
+            </div>
+          </div>
+          <div data-body></div>
+          <div class="load-more" data-more hidden><button class="btn btn-outline btn-sm" type="button">Load 20 more</button></div>
+        </section>
+
+        <section class="card" role="tabpanel" id="panel-loans" aria-labelledby="tab-loans" hidden>
+          <div class="toolbar">
+            <span class="count-note">Newest requests first.</span>
+            <div class="chips" role="group" aria-label="Filter by status" data-filters>
+              <button class="chip" type="button" data-filter="" aria-pressed="true">All</button>
+              <button class="chip" type="button" data-filter="requested" aria-pressed="false">Requested</button>
+              <button class="chip" type="button" data-filter="approved" aria-pressed="false">Approved</button>
+              <button class="chip" type="button" data-filter="lent" aria-pressed="false">Lent</button>
+              <button class="chip" type="button" data-filter="returned" aria-pressed="false">Returned</button>
+              <button class="chip" type="button" data-filter="lost" aria-pressed="false">Lost</button>
+              <button class="chip" type="button" data-filter="cancelled" aria-pressed="false">Cancelled</button>
+              <button class="chip" type="button" data-filter="rejected" aria-pressed="false">Rejected</button>
+            </div>
+          </div>
+          <div data-body></div>
+          <div class="load-more" data-more hidden><button class="btn btn-outline btn-sm" type="button">Load 20 more</button></div>
+        </section>
+
+        <section class="card" role="tabpanel" id="panel-friendships" aria-labelledby="tab-friendships" hidden>
+          <div class="toolbar">
+            <span class="count-note">Newest first. A pending request nobody answers stays forever unless it's deleted.</span>
+            <div class="chips" role="group" aria-label="Filter by status" data-filters>
+              <button class="chip" type="button" data-filter="" aria-pressed="true">All</button>
+              <button class="chip" type="button" data-filter="pending" aria-pressed="false">Pending</button>
+              <button class="chip" type="button" data-filter="accepted" aria-pressed="false">Accepted</button>
+            </div>
+          </div>
+          <div data-body></div>
+          <div class="load-more" data-more hidden><button class="btn btn-outline btn-sm" type="button">Load 20 more</button></div>
+        </section>
+
+        <section class="card" role="tabpanel" id="panel-reports" aria-labelledby="tab-reports" hidden>
+          <div class="toolbar">
+            <span class="count-note">Reports people sent from the app about public and unlisted libraries, newest first.</span>
+          </div>
+          <div data-body></div>
+          <div class="load-more" data-more hidden><button class="btn btn-outline btn-sm" type="button">Load 20 more</button></div>
+        </section>
+
+        <section class="card" role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" hidden>
+          <div class="toolbar">
+            <span class="count-note">Ratings and reviews from every reader, most recently changed first. Removing a review keeps the rating.</span>
+          </div>
+          <div data-body></div>
+          <div class="load-more" data-more hidden><button class="btn btn-outline btn-sm" type="button">Load 20 more</button></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatDate, formatNumber, formatRelative } from "/admin/js/format.js";
+    import {
+      accessBadge, catalogUrl, chipFilter, confirmDialog, coverHtml, emptyHtml, icon,
+      loadErrorHtml, loadingHtml, openDrawer, pagedList, personHtml, runAction, statusBadge, toast,
+    } from "/admin/js/ui.js";
+
+    const REASONS = {
+      spam: "Spam or advertising",
+      inappropriate: "Offensive or adult content",
+      impersonation: "Pretending to be someone else",
+      other: "Something else",
+    };
+    const ROLES = {
+      owner: '<span class="badge badge-secondary">Owner</span>',
+      editor: '<span class="badge badge-accent">Editor</span>',
+      member: '<span class="badge badge-info">Member</span>',
+    };
+
+    const LOCK_BADGE = `<span class="badge badge-error">${icon("lock")}Locked</span>`;
+
+    await startAdminPage({ active: "content", crumbs: ["Governance", "Content & Libraries"] });
+
+    const userLink = (uid, label) => uid
+      ? `<a href="/admin/users.html#user=${encodeURIComponent(uid)}">${escapeHtml(label)}</a>`
+      : escapeHtml(label);
+
+    const plural = (n, one, many) => `${formatNumber(n)} ${n === 1 ? one : many}`;
+
+    // ---------- Panels ----------
+
+    // Each tab: its list endpoint, the array in the response, and how rows draw
+    const panels = {};
+
+    function makePanel(name, { path, key, filterParam, render, what }) {
+      const el = document.getElementById(`panel-${name}`);
+      let filter = "";
+      const list = pagedList({
+        body: el.querySelector("[data-body]"),
+        more: el.querySelector("[data-more]"),
+        what,
+        render,
+        async fetchPage(after) {
+          const params = new URLSearchParams();
+          if (filter && filterParam) params.set(filterParam, filter);
+          if (after) params.set("after", after);
+          const page = await api(`${path}?${params}`);
+          return { items: page[key], nextCursor: page.nextCursor };
+        },
+      });
+      const chips = el.querySelector("[data-filters]");
+      if (chips) chipFilter(chips, (value) => { filter = value; list.reload(); });
+      panels[name] = { el, list, loaded: false, get filter() { return filter; } };
+      return panels[name];
+    }
+
+    function removeItem(panel, match) {
+      panel.list.update(panel.list.items.filter((item) => !match(item)));
+    }
+
+    // ---------- Libraries ----------
+
+    makePanel("libraries", {
+      path: "/libraries", key: "libraries", filterParam: "access", what: "libraries",
+      render(libraries) {
+        if (!libraries.length) {
+          return emptyHtml("shelves", panels.libraries.filter
+            ? `No ${panels.libraries.filter} libraries.`
+            : "No libraries yet.");
+        }
+        return `
+          <div class="table-wrap"><table class="table">
+            <thead><tr>
+              <th scope="col">Library</th>
+              <th scope="col">Access</th>
+              <th scope="col" class="hide-narrow">Owner</th>
+              <th scope="col" class="num">Books</th>
+              <th scope="col" class="num hide-narrow">Members</th>
+              <th scope="col" class="num hide-narrow">Created</th>
+            </tr></thead>
+            <tbody>${libraries.map((l) => `
+              <tr data-open="${escapeHtml(l.id)}" tabindex="0">
+                <td><div class="person-text"><strong>${escapeHtml(l.name)}</strong>
+                  ${l.handle ? `<span class="muted">/lib/${escapeHtml(l.handle)}</span>` : ""}</div></td>
+                <td class="nowrap">${accessBadge(l.access)} ${l.adminLocked ? LOCK_BADGE : ""}</td>
+                <td class="hide-narrow">${l.ownerUsername ? `@${escapeHtml(l.ownerUsername)}` : '<span class="muted">No profile</span>'}</td>
+                <td class="num">${formatNumber(l.bookCount)}</td>
+                <td class="num hide-narrow">${formatNumber(l.memberCount)}</td>
+                <td class="num hide-narrow muted">${escapeHtml(formatDate(l.createdAt))}</td>
+              </tr>`).join("")}
+            </tbody>
+          </table></div>`;
+      },
+    });
+
+    function bookHtml(b) {
+      const out = b.lentCount ? `, ${formatNumber(b.lentCount)} out` : "";
+      return `
+        <li data-book="${escapeHtml(b.id)}">
+          <span class="list-main book-cell">
+            ${coverHtml(b.coverUrl, b.title)}
+            <span class="person-text">
+              <strong>${escapeHtml(b.title)}</strong>
+              <span class="muted">${escapeHtml(b.authors.join(", ") || "No author")}</span>
+              <span class="hint">${plural(b.noOfCopies, "copy", "copies")}${out}${b.isbn ? ` · ISBN ${escapeHtml(b.isbn)}` : ""}</span>
+            </span>
+          </span>
+          <span class="list-side">
+            ${b.visibility === "private" ? `<span class="badge badge-info">${icon("visibility_off")}Private</span>` : ""}
+            <button class="icon-btn" type="button" data-edit aria-label="Edit ${escapeHtml(b.title)}" title="Edit">${icon("edit")}</button>
+            <button class="icon-btn" type="button" data-remove aria-label="Remove ${escapeHtml(b.title)}" title="Remove">${icon("delete")}</button>
+          </span>
+        </li>`;
+    }
+
+    function libraryBadgesHtml(l) {
+      const open = l.access !== "private" && l.handle;
+      return `${accessBadge(l.access)}
+        ${l.adminLocked ? LOCK_BADGE : ""}
+        ${open ? `<a class="badge badge-accent" href="${escapeHtml(catalogUrl(l.handle))}" target="_blank" rel="noopener">${icon("open_in_new")}Web page</a>` : ""}`;
+    }
+
+    function lockActionHtml(l) {
+      const [title, text, label, cls] = l.adminLocked
+        ? ["Unlock", "The owner can change who sees this library again. It stays private until they do.",
+          "Unlock", "btn-outline"]
+        : ["Make private and lock", "Only members can see it, the web page goes offline, and the owner can't open it up again until you unlock it.",
+          "Make private", "btn-danger-outline"];
+      return `
+        <div class="action">
+          <div class="action-text"><strong>${title}</strong><span>${text}</span></div>
+          <button class="btn ${cls} btn-xs" type="button" data-lock="${l.adminLocked ? "off" : "on"}">${label}</button>
+        </div>`;
+    }
+
+    function libraryHtml(l) {
+      return `
+        <div class="drawer-hero">
+          <span class="icon-tile" style="width:56px;height:56px">${icon("shelves")}</span>
+          <div style="min-width:0">
+            <h3>${escapeHtml(l.name)}</h3>
+            <div class="badges">${libraryBadgesHtml(l)}</div>
+          </div>
+        </div>
+        ${l.description ? `<p style="margin:0">${escapeHtml(l.description)}</p>` : ""}
+        <dl class="kv">
+          <dt>Owner</dt><dd>${userLink(l.ownerId, l.ownerUsername ? `@${l.ownerUsername}` : "No profile")}</dd>
+          <dt>Created</dt><dd>${escapeHtml(formatDate(l.createdAt))}</dd>
+          <dt>Library id</dt><dd class="uid">${escapeHtml(l.id)}</dd>
+        </dl>
+        <div class="mini-stats">
+          <div><strong>${formatNumber(l.bookCount)}</strong><span>Copies</span></div>
+          <div><strong>${formatNumber(l.uniqueCount)}</strong><span>Editions</span></div>
+          <div><strong>${formatNumber(l.memberCount)}</strong><span>Members</span></div>
+        </div>
+        <section class="section" aria-label="Members">
+          <h4 class="section-title">Members</h4>
+          <ul class="list">${l.members.map((m) => `
+            <li>
+              <a class="list-main" href="/admin/users.html#user=${encodeURIComponent(m.uid)}" style="color:inherit">${personHtml(m)}</a>
+              <span class="list-side">${ROLES[m.role]}</span>
+            </li>`).join("")}</ul>
+        </section>
+        <section class="section" aria-label="Books">
+          <h4 class="section-title">Books <span class="count-note">every book, private ones too</span></h4>
+          <div data-books>${loadingHtml("Loading books…")}</div>
+          <div class="load-more" data-books-more hidden><button class="btn btn-outline btn-sm" type="button">Load 25 more</button></div>
+        </section>
+        <section class="section" aria-label="Moderation">
+          <div class="actions${l.adminLocked ? "" : " actions-danger"}" data-lock-slot>${lockActionHtml(l)}</div>
+        </section>`;
+    }
+
+    /**
+     * Locks or unlocks a library after confirming, then updates the library
+     * and report rows that show it. Resolves the new state, or null.
+     */
+    async function setLock(library, locked, button) {
+      const confirmed = await confirmDialog(locked
+        ? {
+          title: "Make private and lock",
+          message: `<p>${escapeHtml(library.name)} becomes private: only its members can see it, and its
+            web page stops working. Members keep everything.</p><p>The owner can't make it public or
+            unlisted again until an admin unlocks it.</p>`,
+          confirmLabel: "Make private",
+          danger: true,
+        }
+        : {
+          title: "Unlock library",
+          message: `<p>The owner of ${escapeHtml(library.name)} can choose who sees it again. It stays
+            private until they change it.</p>`,
+          confirmLabel: "Unlock",
+        });
+      if (!confirmed) return null;
+
+      let state;
+      const ok = await runAction(button, async () => {
+        state = await api(`/libraries/${encodeURIComponent(library.id)}/lock`, {
+          method: "PUT", body: { locked },
+        });
+      }, locked ? "Library made private and locked" : "Library unlocked");
+      if (!ok) return null;
+
+      // Only lists that have loaded rows; update() on an unloaded one would draw it empty
+      const libs = panels.libraries.list;
+      if (libs.items.length) {
+        const filter = panels.libraries.filter;
+        libs.update(libs.items
+          .map((l) => (l.id === library.id ? { ...l, ...state } : l))
+          .filter((l) => !filter || l.access === filter));
+      }
+      const reports = panels.reports.list;
+      if (reports.items.length) {
+        reports.update(reports.items.map((r) => (r.libraryId === library.id
+          ? { ...r, libraryAccess: state.access, libraryLocked: state.adminLocked }
+          : r)));
+      }
+      return state;
+    }
+
+    /** The book editor. Resolves the edited fields, or null when cancelled. */
+    function editBookDialog(book) {
+      return new Promise((resolve) => {
+        const dialog = document.createElement("dialog");
+        dialog.className = "modal modal-wide";
+        dialog.setAttribute("aria-labelledby", "book-title");
+        const field = (id, label, value, extra = "") => `
+          <div class="field ${extra}">
+            <label for="${id}">${label}</label>
+            <input class="input" id="${id}" value="${escapeHtml(value ?? "")}" autocomplete="off">
+          </div>`;
+        dialog.innerHTML = `
+          <form method="dialog" class="modal-form">
+            <h2 class="title-lg" id="book-title">Edit book</h2>
+            <div class="form-grid">
+              ${field("b-title", "Title", book.title, "span-2")}
+              ${field("b-subtitle", "Subtitle", book.subtitle, "span-2")}
+              ${field("b-authors", "Authors", book.authors.join(", "), "span-2")}
+              ${field("b-isbn", "ISBN-13", book.isbn)}
+              ${field("b-genres", "Genres", book.categories.join(", "))}
+              ${field("b-cover", "Cover link", book.coverUrl, "span-2")}
+            </div>
+            <span class="hint">Separate authors and genres with commas. Copies, visibility and loans
+              don't change here.</span>
+            <div class="modal-actions">
+              <button class="btn btn-outline btn-sm" value="cancel" type="submit">Cancel</button>
+              <button class="btn btn-primary btn-sm" value="ok" type="submit">Save book</button>
+            </div>
+          </form>`;
+        document.body.append(dialog);
+        const read = (id) => dialog.querySelector(`#${id}`).value.trim();
+        const split = (text) => text.split(",").map((s) => s.trim()).filter(Boolean);
+        dialog.addEventListener("close", () => {
+          const ok = dialog.returnValue === "ok";
+          const values = ok && {
+            title: read("b-title"),
+            subtitle: read("b-subtitle") || null,
+            authors: split(read("b-authors")),
+            isbn: read("b-isbn") || null,
+            categories: split(read("b-genres")),
+            coverUrl: read("b-cover") || null,
+          };
+          dialog.remove();
+          resolve(values || null);
+        });
+        dialog.showModal();
+      });
+    }
+
+    function wireBooks(drawer, library) {
+      const body = drawer.body.querySelector("[data-books]");
+      const more = drawer.body.querySelector("[data-books-more]");
+      const moreBtn = more.querySelector("button");
+      let books = [];
+      let cursor = null;
+      const base = `/libraries/${encodeURIComponent(library.id)}/books`;
+
+      const render = () => {
+        body.innerHTML = books.length
+          ? `<ul class="list">${books.map(bookHtml).join("")}</ul>`
+          : emptyHtml("menu_book", "No books in this library.");
+        more.hidden = !cursor;
+      };
+
+      async function load(append) {
+        moreBtn.disabled = true;
+        try {
+          const page = await api(`${base}${append && cursor ? `?after=${encodeURIComponent(cursor)}` : ""}`);
+          books = append ? [...books, ...page.books] : page.books;
+          cursor = page.nextCursor;
+          render();
+        } catch (err) {
+          if (append) toast(err.message, "error");
+          else body.innerHTML = loadErrorHtml(err, "books");
+        } finally {
+          moreBtn.disabled = false;
+        }
+      }
+
+      moreBtn.addEventListener("click", () => load(true));
+      body.addEventListener("click", async (event) => {
+        const row = event.target.closest("[data-book]");
+        if (!row) return;
+        const book = books.find((b) => b.id === row.dataset.book);
+        const path = `${base}/${encodeURIComponent(book.id)}`;
+
+        if (event.target.closest("[data-edit]")) {
+          const values = await editBookDialog(book);
+          if (!values) return;
+          let saved;
+          const ok = await runAction(null, async () => {
+            saved = await api(path, { method: "PATCH", body: values });
+          }, "Book saved");
+          if (ok) {
+            books = books.map((b) => (b.id === book.id ? saved : b));
+            render();
+          }
+        } else if (event.target.closest("[data-remove]")) {
+          const button = event.target.closest("[data-remove]");
+          const confirmed = await confirmDialog({
+            title: "Remove book",
+            message: `<p>"${escapeHtml(book.title)}" and its ${plural(book.noOfCopies, "copy", "copies")}
+              leave ${escapeHtml(library.name)}. The library's book counts go down to match.</p>`,
+            confirmLabel: "Remove book",
+            danger: true,
+          });
+          if (!confirmed) return;
+          const ok = await runAction(button, () => api(path, { method: "DELETE" }), "Book removed");
+          if (ok) {
+            books = books.filter((b) => b.id !== book.id);
+            render();
+          }
+        }
+      });
+
+      load(false);
+    }
+
+    // The lock action in the drawer; the hero badges redraw to match
+    function wireLock(drawer, library) {
+      const slot = drawer.body.querySelector("[data-lock-slot]");
+      slot.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-lock]");
+        if (!button) return;
+        const state = await setLock(library, button.dataset.lock === "on", button);
+        if (!state) return;
+        Object.assign(library, state);
+        drawer.body.querySelector(".drawer-hero .badges").innerHTML = libraryBadgesHtml(library);
+        slot.classList.toggle("actions-danger", !library.adminLocked);
+        slot.innerHTML = lockActionHtml(library);
+      });
+    }
+
+    async function openLibrary(id) {
+      history.replaceState(null, "", `#library=${encodeURIComponent(id)}`);
+      const drawer = openDrawer({
+        title: "Library",
+        onClose: () => history.replaceState(null, "", "#tab=libraries"),
+      });
+      try {
+        const library = await api(`/libraries/${encodeURIComponent(id)}`);
+        drawer.setTitle(library.name);
+        drawer.body.innerHTML = libraryHtml(library);
+        wireBooks(drawer, library);
+        wireLock(drawer, library);
+      } catch (err) {
+        drawer.body.innerHTML = loadErrorHtml(err, "this library");
+      }
+    }
+
+    // ---------- Loans ----------
+
+    const isOverdue = (l) => l.status === "lent" && l.dueOn && new Date(l.dueOn) < new Date();
+
+    makePanel("loans", {
+      path: "/loans", key: "loans", filterParam: "status", what: "loans",
+      render(loans) {
+        if (!loans.length) {
+          return emptyHtml("swap_horiz", panels.loans.filter ? `No ${panels.loans.filter} loans.` : "No loans yet.");
+        }
+        return `
+          <div class="table-wrap"><table class="table">
+            <thead><tr>
+              <th scope="col">Book</th>
+              <th scope="col">Borrower</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="hide-narrow">Requested</th>
+              <th scope="col" class="hide-narrow">Due</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr></thead>
+            <tbody>${loans.map((l) => `
+              <tr data-loan="${escapeHtml(l.id)}">
+                <td><div class="book-cell">${coverHtml(l.coverUrl, l.bookTitle)}
+                  <div class="person-text"><strong>${escapeHtml(l.bookTitle)}</strong>
+                    <span class="muted">${escapeHtml(l.libraryName)}</span></div></div></td>
+                <td>${l.borrowerId ? userLink(l.borrowerId, l.borrowerName || "Unknown") : `${escapeHtml(l.borrowerName)} <span class="hint">off the app</span>`}</td>
+                <td class="nowrap">${statusBadge(l.status)} ${isOverdue(l) ? '<span class="badge badge-error">Overdue</span>' : ""}</td>
+                <td class="nowrap hide-narrow muted">${escapeHtml(formatDate(l.requestedOn))}</td>
+                <td class="nowrap hide-narrow muted">${escapeHtml(formatDate(l.dueOn))}</td>
+                <td><div class="row-actions">${
+                  l.status === "lent"
+                    ? `<button class="btn btn-outline btn-xs" type="button" data-resolve="returned">Returned</button>
+                       <button class="btn btn-danger-outline btn-xs" type="button" data-resolve="lost">Lost</button>`
+                    : ["requested", "approved"].includes(l.status)
+                      ? `<button class="btn btn-outline btn-xs" type="button" data-resolve="cancelled">Cancel</button>`
+                      : ""}</div></td>
+              </tr>`).join("")}
+            </tbody>
+          </table></div>`;
+      },
+    });
+
+    const OUTCOME_TEXT = {
+      returned: ["Mark returned", "The copy goes back on the shelf, so it can be lent again."],
+      lost: ["Mark lost", "The copy leaves the library: one copy fewer, or the book is removed if it was the last one."],
+      cancelled: ["Cancel loan", "The request ends. No copy was handed over, so nothing changes on the shelf."],
+    };
+
+    // ---------- Friendships ----------
+
+    makePanel("friendships", {
+      path: "/friendships", key: "friendships", filterParam: "status", what: "friendships",
+      render(rows) {
+        if (!rows.length) {
+          return emptyHtml("handshake", panels.friendships.filter ? `No ${panels.friendships.filter} friendships.` : "No friendships yet.");
+        }
+        return `
+          <div class="table-wrap"><table class="table">
+            <thead><tr>
+              <th scope="col">From</th>
+              <th scope="col">To</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="hide-narrow">Sent</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr></thead>
+            <tbody>${rows.map((f) => `
+              <tr data-friendship="${escapeHtml(f.id)}">
+                <td>${userLink(f.fromUid, `@${f.fromUsername || "unknown"}`)}</td>
+                <td>${userLink(f.toUid, `@${f.toUsername || "unknown"}`)}</td>
+                <td>${statusBadge(f.status)}</td>
+                <td class="nowrap hide-narrow muted">${escapeHtml(formatRelative(f.createdAt))}</td>
+                <td><div class="row-actions"><button class="btn btn-danger-outline btn-xs" type="button" data-delete>Delete</button></div></td>
+              </tr>`).join("")}
+            </tbody>
+          </table></div>`;
+      },
+    });
+
+    // ---------- Reports ----------
+
+    makePanel("reports", {
+      path: "/reports", key: "reports", what: "reports",
+      render(rows) {
+        if (!rows.length) return emptyHtml("flag", "No open reports.");
+        return `
+          <div class="table-wrap"><table class="table">
+            <thead><tr>
+              <th scope="col">Library</th>
+              <th scope="col">Reason</th>
+              <th scope="col" class="hide-narrow">Reported by</th>
+              <th scope="col" class="hide-narrow">When</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr></thead>
+            <tbody>${rows.map((r) => `
+              <tr data-report="${escapeHtml(r.id)}">
+                <td><div class="person-text">
+                  ${r.libraryAccess
+                    ? `<a href="#library=${encodeURIComponent(r.libraryId)}" data-library="${escapeHtml(r.libraryId)}"><strong>${escapeHtml(r.libraryName)}</strong></a>`
+                    : `<strong>${escapeHtml(r.libraryName)}</strong>`}
+                  <span class="nowrap">${r.libraryAccess
+                    ? `${accessBadge(r.libraryAccess)} ${r.libraryLocked ? LOCK_BADGE : ""}`
+                    : '<span class="hint">Deleted since</span>'}</span>
+                </div></td>
+                <td><div class="person-text" style="max-width:40ch">
+                  <strong>${escapeHtml(REASONS[r.reason] ?? r.reason)}</strong>
+                  ${r.note ? `<span class="muted" style="white-space:normal">${escapeHtml(r.note)}</span>` : ""}
+                </div></td>
+                <td class="hide-narrow">${userLink(r.reporterId, r.reporterUsername ? `@${r.reporterUsername}` : "No profile")}</td>
+                <td class="nowrap hide-narrow muted">${escapeHtml(formatRelative(r.createdAt))}</td>
+                <td><div class="row-actions">
+                  ${r.libraryAccess && !r.libraryLocked
+                    ? '<button class="btn btn-danger-outline btn-xs" type="button" data-lock-report>Make private</button>'
+                    : ""}
+                  <button class="btn btn-outline btn-xs" type="button" data-dismiss>Dismiss</button>
+                </div></td>
+              </tr>`).join("")}
+            </tbody>
+          </table></div>`;
+      },
+    });
+
+    // ---------- Reviews ----------
+
+    makePanel("reviews", {
+      path: "/reviews", key: "reviews", what: "reviews",
+      render(rows) {
+        if (!rows.length) return emptyHtml("rate_review", "No ratings or reviews yet.");
+        return `
+          <div class="table-wrap"><table class="table">
+            <thead><tr>
+              <th scope="col">Book</th>
+              <th scope="col">Review</th>
+              <th scope="col" class="num">Rating</th>
+              <th scope="col" class="hide-narrow">By</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr></thead>
+            <tbody>${rows.map((r) => `
+              <tr data-review="${escapeHtml(r.id)}">
+                <td><div class="person-text"><strong>${escapeHtml(r.title ?? r.readingKey)}</strong>
+                  <span class="muted">${escapeHtml(r.authors.join(", "))}</span></div></td>
+                <td style="max-width:48ch">${r.review
+                  ? `<span style="white-space:pre-line">${escapeHtml(r.review)}</span>`
+                  : '<span class="hint">Rating only</span>'}
+                  <div class="hint">${escapeHtml(formatRelative(r.updatedAt))}</div></td>
+                <td class="num">${r.rating ? `${r.rating}/10` : "—"}</td>
+                <td class="hide-narrow">${userLink(r.uid, r.username ? `@${r.username}` : "No profile")}</td>
+                <td><div class="row-actions">${r.review
+                  ? '<button class="btn btn-danger-outline btn-xs" type="button" data-remove-review>Remove review</button>'
+                  : ""}</div></td>
+              </tr>`).join("")}
+            </tbody>
+          </table></div>`;
+      },
+    });
+
+    // ---------- Row actions ----------
+
+    const libBody = panels.libraries.el.querySelector("[data-body]");
+    libBody.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-open]");
+      if (row) openLibrary(row.dataset.open);
+    });
+    libBody.addEventListener("keydown", (event) => {
+      const row = event.target.closest("[data-open]");
+      if (row && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        openLibrary(row.dataset.open);
+      }
+    });
+
+    panels.loans.el.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-resolve]");
+      if (!button) return;
+      const id = button.closest("[data-loan]").dataset.loan;
+      const loan = panels.loans.list.items.find((l) => l.id === id);
+      const outcome = button.dataset.resolve;
+      const [label, text] = OUTCOME_TEXT[outcome];
+      const confirmed = await confirmDialog({
+        title: label,
+        message: `<p>"${escapeHtml(loan.bookTitle)}", borrowed by ${escapeHtml(loan.borrowerName || "someone")}.</p><p>${text}</p>`,
+        confirmLabel: label,
+        danger: outcome === "lost",
+      });
+      if (!confirmed) return;
+      const ok = await runAction(button,
+        () => api(`/loans/${encodeURIComponent(id)}/resolve`, { method: "POST", body: { outcome } }),
+        `Loan marked ${outcome}`);
+      if (!ok) return;
+      const list = panels.loans.list;
+      // Under a status filter the loan no longer belongs in the list
+      if (panels.loans.filter) removeItem(panels.loans, (l) => l.id === id);
+      else list.update(list.items.map((l) => (l.id === id ? { ...l, status: outcome } : l)));
+    });
+
+    panels.friendships.el.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-delete]");
+      if (!button) return;
+      const id = button.closest("[data-friendship]").dataset.friendship;
+      const f = panels.friendships.list.items.find((x) => x.id === id);
+      const confirmed = await confirmDialog({
+        title: f.status === "pending" ? "Delete friend request" : "Delete friendship",
+        message: `<p>@${escapeHtml(f.fromUsername)} and @${escapeHtml(f.toUsername)} ${f.status === "pending"
+          ? "lose this request. Either of them can send a new one."
+          : "stop being friends and lose access to each other's reading activity."}</p>`,
+        confirmLabel: "Delete",
+        danger: true,
+      });
+      if (!confirmed) return;
+      const ok = await runAction(button,
+        () => api(`/friendships/${encodeURIComponent(id)}`, { method: "DELETE" }), "Deleted");
+      if (ok) removeItem(panels.friendships, (x) => x.id === id);
+    });
+
+    panels.reports.el.addEventListener("click", async (event) => {
+      const link = event.target.closest("[data-library]");
+      if (link) {
+        event.preventDefault();
+        openLibrary(link.dataset.library);
+        return;
+      }
+      const lockButton = event.target.closest("[data-lock-report]");
+      if (lockButton) {
+        const id = lockButton.closest("[data-report]").dataset.report;
+        const report = panels.reports.list.items.find((r) => r.id === id);
+        await setLock({ id: report.libraryId, name: report.libraryName }, true, lockButton);
+        return;
+      }
+      const button = event.target.closest("[data-dismiss]");
+      if (!button) return;
+      const id = button.closest("[data-report]").dataset.report;
+      const ok = await runAction(button,
+        () => api(`/reports/${encodeURIComponent(id)}`, { method: "DELETE" }), "Report dismissed");
+      if (ok) removeItem(panels.reports, (r) => r.id === id);
+    });
+
+    panels.reviews.el.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-remove-review]");
+      if (!button) return;
+      const path = button.closest("[data-review]").dataset.review;
+      const review = panels.reviews.list.items.find((r) => r.id === path);
+      const confirmed = await confirmDialog({
+        title: "Remove review",
+        message: `<p>The text of ${escapeHtml(review.username ? `@${review.username}` : "this reader")}'s review is
+          deleted. Their ${review.rating ? `${review.rating}/10 ` : ""}rating stays.</p>`,
+        confirmLabel: "Remove review",
+        danger: true,
+      });
+      if (!confirmed) return;
+      const ok = await runAction(button,
+        () => api("/reviews/remove", { method: "POST", body: { path } }), "Review removed");
+      if (ok) {
+        panels.reviews.list.update(panels.reviews.list.items.map((r) =>
+          (r.id === path ? { ...r, review: null } : r)));
+      }
+    });
+
+    // ---------- Tabs ----------
+
+    const tabs = [...document.querySelectorAll("[data-tab]")];
+
+    function showTab(name, { focus = false } = {}) {
+      tabs.forEach((tab) => {
+        const selected = tab.dataset.tab === name;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && focus) tab.focus();
+      });
+      Object.entries(panels).forEach(([key, panel]) => (panel.el.hidden = key !== name));
+      const panel = panels[name];
+      if (!panel.loaded) {
+        panel.loaded = true;
+        panel.list.reload();
+      }
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => {
+        history.replaceState(null, "", `#tab=${tab.dataset.tab}`);
+        showTab(tab.dataset.tab);
+      });
+      tab.addEventListener("keydown", (event) => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+        if (!step) return;
+        const next = tabs[(i + step + tabs.length) % tabs.length];
+        history.replaceState(null, "", `#tab=${next.dataset.tab}`);
+        showTab(next.dataset.tab, { focus: true });
+      });
+    });
+
+    const hash = new URLSearchParams(location.hash.slice(1));
+    const linkedLibrary = hash.get("library");
+    showTab(panels[hash.get("tab")] ? hash.get("tab") : "libraries");
+    if (linkedLibrary) openLibrary(linkedLibrary);
+  </script>
+</body>
+</html>

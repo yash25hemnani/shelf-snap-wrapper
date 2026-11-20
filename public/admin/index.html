@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · ShelfSnap Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-live="polite">
+    <span class="material-symbols-outlined" aria-label="Loading">progress_activity</span>
+  </div>
+
+  <div class="shell">
+    <div class="main">
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="headline-xl">Dashboard</h1>
+            <p>What's in ShelfSnap right now, and how the wrapper has been used over the last 30 days.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="refresh" type="button">
+            <span class="material-symbols-outlined">refresh</span>
+            Refresh
+          </button>
+        </div>
+
+        <div id="totals-error" hidden></div>
+
+        <section class="stat-grid" aria-label="Totals">
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">group</span>Users</div>
+            <div class="stat-value" data-total="users"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat stat-wide">
+            <div class="stat-label"><span class="material-symbols-outlined">shelves</span>Libraries</div>
+            <div class="stat-value" data-total="libraries"><span class="skeleton">0</span></div>
+            <div class="split-bar" id="access-bar" aria-hidden="true"></div>
+            <div class="split-legend" id="access-legend"></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">menu_book</span>Books</div>
+            <div class="stat-value" data-total="books"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">swap_horiz</span>Loans</div>
+            <div class="stat-value" data-total="loans"><span class="skeleton">0</span></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-label"><span class="material-symbols-outlined">handshake</span>Friendships</div>
+            <div class="stat-value" data-total="friendships"><span class="skeleton">0</span></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="trend-title">
+          <div class="card-header">
+            <div>
+              <h2 class="title-md" id="trend-title">Last 30 days</h2>
+              <div class="stat-sub">Per UTC day, from the wrapper's usage counters</div>
+            </div>
+            <div class="segmented" role="group" aria-label="Metric">
+              <button type="button" data-metric="scans" aria-pressed="true">Scans</button>
+              <button type="button" data-metric="searches" aria-pressed="false">Searches</button>
+              <button type="button" data-metric="tokens" aria-pressed="false">Tokens</button>
+            </div>
+          </div>
+          <div id="trend-chart" class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            Loading usage…
+          </div>
+          <div class="period-summary" id="trend-summary" hidden></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { startAdminPage, escapeHtml } from "/admin/js/shell.js";
+    import { api } from "/admin/js/api.js";
+    import { formatCompact, formatNumber } from "/admin/js/format.js";
+    import { renderBarChart, scansOf, searchesOf } from "/admin/js/chart.js";
+
+    const ACCESS = [
+      { key: "public", label: "Public", color: "var(--primary)" },
+      { key: "unlisted", label: "Unlisted", color: "var(--secondary)" },
+      { key: "private", label: "Private", color: "var(--info)" },
+    ];
+
+    const METRICS = {
+      scans: { value: scansOf, unit: "scans" },
+      searches: { value: searchesOf, unit: "searches" },
+      tokens: { value: (day) => day.totalTokens, unit: "tokens" },
+    };
+
+    let days = [];
+    let metric = "scans";
+
+    function errorHtml(message) {
+      return `
+        <div class="alert alert-error" style="margin-bottom:var(--gutter)">
+          <span class="material-symbols-outlined">error</span>
+          <span>${escapeHtml(message)}</span>
+        </div>`;
+    }
+
+    function setTotal(name, value) {
+      document.querySelector(`[data-total="${name}"]`).textContent = formatNumber(value);
+    }
+
+    function renderTotals(totals) {
+      setTotal("users", totals.users);
+      setTotal("libraries", totals.libraries.total);
+      setTotal("books", totals.books);
+      setTotal("loans", totals.loans);
+      setTotal("friendships", totals.friendships);
+
+      const total = totals.libraries.total || 1;
+      document.getElementById("access-bar").innerHTML = ACCESS.map((a) =>
+        `<span style="width:${(totals.libraries[a.key] / total) * 100}%;background:${a.color}"></span>`,
+      ).join("");
+      document.getElementById("access-legend").innerHTML = ACCESS.map((a) =>
+        `<span><i style="background:${a.color}"></i>${a.label} ${formatNumber(totals.libraries[a.key])}</span>`,
+      ).join("");
+    }
+
+    function renderTrend() {
+      const { value, unit } = METRICS[metric];
+      const chart = document.getElementById("trend-chart");
+      chart.className = "";
+      renderBarChart(chart, days.map((d) => ({ date: d.date, value: value(d) })), { unit });
+    }
+
+    function renderSummary() {
+      const sum = (fn) => days.reduce((n, d) => n + fn(d), 0);
+      const scans = sum(scansOf);
+      const tokens = sum((d) => d.totalTokens);
+      const items = [
+        ["Scans", formatNumber(scans)],
+        ["Searches", formatNumber(sum(searchesOf))],
+        ["Tokens", formatCompact(tokens)],
+        ["Tokens per scan", formatNumber(scans ? Math.round(tokens / scans) : 0)],
+        ["Gemini fallbacks", formatNumber(sum((d) => d.providers.gemini ?? 0))],
+      ];
+      const el = document.getElementById("trend-summary");
+      el.hidden = false;
+      el.innerHTML = items.map(([label, value]) =>
+        `<div><strong>${value}</strong><span>${label}</span></div>`).join("");
+    }
+
+    async function loadTotals() {
+      const errorEl = document.getElementById("totals-error");
+      errorEl.hidden = true;
+      try {
+        renderTotals(await api("/stats"));
+      } catch (err) {
+        errorEl.hidden = false;
+        errorEl.innerHTML = errorHtml(`Couldn't load totals: ${err.message}`);
+      }
+    }
+
+    async function loadTrend() {
+      try {
+        ({ days } = await api("/usage/daily?days=30"));
+        renderTrend();
+        renderSummary();
+      } catch (err) {
+        const chart = document.getElementById("trend-chart");
+        chart.className = "empty-state";
+        chart.innerHTML = `
+          <span class="material-symbols-outlined">cloud_off</span>
+          ${escapeHtml(`Couldn't load usage: ${err.message}`)}`;
+      }
+    }
+
+    document.querySelectorAll("[data-metric]").forEach((button) => {
+      button.addEventListener("click", () => {
+        metric = button.dataset.metric;
+        document.querySelectorAll("[data-metric]").forEach((b) =>
+          b.setAttribute("aria-pressed", String(b === button)));
+        if (days.length) renderTrend();
+      });
+    });
+
+    await startAdminPage({ active: "dashboard", crumbs: ["Overview", "Dashboard"] });
+
+    const refresh = document.getElementById("refresh");
+    refresh.addEventListener("click", async () => {
+      refresh.disabled = true;
+      await Promise.all([loadTotals(), loadTrend()]);
+      refresh.disabled = false;
+    });
+    loadTotals();
+    loadTrend();
+  </script>
+</body>
+</html>

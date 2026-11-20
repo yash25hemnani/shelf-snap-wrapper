@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+
+<html lang="en" style="width: 1280px; height: 100%; min-height: 100vh; overflow-x: hidden;"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&amp;family=Google+Sans+Text:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; font-family: 'Google Sans Text', 'Google Sans', -apple-system, sans-serif; background-color: #fafbfb; color: #1B2B22; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2F6B4F",
+            "primary-dark": "#1F4A36",
+            "primary-soft": "#E3EFE8",
+            "accent": "#3A6EA5",
+            "accent-soft": "#E6EEF7",
+            "secondary": "#A8842F",
+            "secondary-soft": "#FBF1DE",
+            "warning": "#C98A1B",
+            "warning-soft": "#FBF1DE",
+            "error": "#D64545",
+            "error-soft": "#FBEAEA",
+            "text-primary": "#1B2B22",
+            "text-secondary": "#5F6F66",
+            "text-hint": "#9AA8A0",
+            "border-subtle": "#E2E8E4",
+            "surface-muted": "#F4F7F5",
+            "surface-container-high": "#EBF0ED"
+          },
+          fontFamily: {
+            sans: ['"Google Sans Text"', '"Google Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafbfb] antialiased text-text-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white z-50 flex flex-col justify-between border-r border-border-subtle">
+<div class="flex flex-col">
+<!-- Brand / Header -->
+<div class="p-5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[19px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[15px] text-text-primary tracking-tight leading-tight">Admin Console</span>
+<span class="text-[11px] text-text-hint font-medium">Platform Governance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-soft text-primary font-mono text-[10px] font-semibold">v1.4</span>
+</div>
+<!-- Navigation -->
+<nav class="p-3.5 flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Overview</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assignment</span>
+<span>Audit Log</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Telemetry &amp; LLM</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">bolt</span>
+<span>Token Tracking</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">warning</span>
+<span>Error Log</span>
+</div>
+<span class="px-2 py-0.2 rounded-full bg-error-soft text-error font-medium text-[11px]">3 active</span>
+</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="px-3 text-[10px] font-bold text-text-hint uppercase tracking-wider">Governance</span>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold text-[13px] bg-primary-soft text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+<span>Content &amp; Libraries</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>Remote Config</span>
+</a>
+</div>
+</nav>
+</div>
+<!-- User / Session Footer -->
+<div class="p-3.5 border-t border-border-subtle bg-white">
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-muted border border-border-subtle">
+<div class="flex items-center gap-2.5">
+<img alt="Alex Chen" class="w-8 h-8 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8"/>
+<div class="flex flex-col leading-tight">
+<span class="font-semibold text-[13px] text-text-primary">Alex Chen</span>
+<span class="text-[11px] text-text-secondary">Superadmin</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-error transition-colors rounded-lg" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Shell Area -->
+<div class="pl-64 min-h-screen flex flex-col">
+<!-- Topbar -->
+<header class="sticky top-0 z-40 h-14 bg-white/95 backdrop-blur-sm border-b border-border-subtle flex items-center justify-between px-8">
+<div class="flex items-center gap-3">
+<span class="text-[13px] font-medium text-text-hint">Governance</span>
+<span class="text-text-hint text-[12px]">/</span>
+<span class="text-[13px] font-semibold text-text-primary">User Directory</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-muted text-text-secondary text-[12px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Directory Sync Active</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle mx-1"></div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle text-text-primary text-[12px] font-medium hover:bg-surface-muted transition-colors">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">sync</span>
+<span>Sync</span>
+</button>
+<img alt="Alex Chen" class="w-7 h-7 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx7KZcuoTzf3XqpLsWue2rhNMwU2ol5BmOuHCAR09zInSQAEINRxpQeEdwOOcZ51Tcab-cV87PryMmoEujstHLuBYYFVxtpL8WXx9wAz84xGCgjr4jtrcG1EK5ZZQ87lBguiPskc02ZW7gez9JZEmM8_QEibEcNshbA8TnLTRUdoUz4n_RceBkLCsDhdld2C_jFRX4uJkE08Z7xE05LTeX12Qt9zxF8duNfDIpQL8"/>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 px-8 py-6 max-w-7xl w-full mx-auto"><div class="flex flex-col w-full gap-6 pb-16">
+<!-- Toast Feedback Overlay -->
+<div class="fixed bottom-6 right-8 z-50 flex items-center gap-3 px-4 py-3 rounded-full bg-text-primary text-white shadow-xl translate-y-20 opacity-0 pointer-events-none transition-all duration-300" id="toast-banner">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed">check_circle</span>
+<span class="font-label-md text-label-md" id="toast-msg">Configuration saved</span>
+<button class="text-text-hint hover:text-white transition-colors" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Breadcrumbs & Page Header -->
+<section class="flex flex-col gap-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-text-hint">
+<span class="hover:text-text-secondary cursor-pointer">Governance</span>
+<span>/</span>
+<span class="text-primary font-medium">Remote Config</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-soft text-secondary font-label-sm text-label-sm font-semibold ml-1">v43-draft</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-text-primary tracking-tight">Remote Config &amp; Release Manager</h1>
+<p class="font-body-md text-body-md text-text-secondary max-w-3xl">
+          Manage mobile client build rollouts, enforce minimum versions, and deploy live in-app announcements across verified instances.
+        </p>
+</div>
+<div class="flex items-center gap-3 self-start md:self-auto">
+<button class="px-5 py-2.5 rounded-full bg-surface-container-lowest text-text-primary font-label-lg text-label-lg hover:bg-surface-muted transition-colors shadow-sm flex items-center gap-2" onclick="triggerToast('Draft restored to production v42')">
+<span class="material-symbols-outlined text-[18px] text-text-secondary">history</span>
+<span>Discard Draft</span>
+</button>
+<button class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-dark transition-all shadow-md flex items-center gap-2.5 group" onclick="openPublishModal()">
+<span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">verified_user</span>
+<span>Publish Changes to Production</span>
+</button>
+</div>
+</div>
+<!-- Live Status Banner -->
+<div class="w-full rounded-2xl bg-surface-container-lowest p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-3.5">
+<div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
+<div class="flex flex-wrap items-center gap-2 text-text-primary font-body-md text-body-md">
+<span class="font-semibold text-primary">Production Config v42</span>
+<span class="text-text-hint">•</span>
+<span class="text-text-secondary">Live &amp; Synchronized across 48,290 devices</span>
+<span class="text-text-hint">•</span>
+<span class="text-text-secondary font-label-sm text-label-sm bg-surface-muted px-2.5 py-0.5 rounded-full">Last published 4 days ago by Alex Chen</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">cloud_done</span>
+<span>Propagation: 99.8%</span>
+</div>
+</div>
+</section>
+<!-- Two-Column Workspace Layout (60% / 40%) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN (60% ~ 7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<!-- Card 1: Client Versioning & Enforced Update Policy -->
+<section class="rounded-2xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-6">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">system_update</span>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-text-primary">Client Versioning &amp; Enforced Update Policy</h2>
+<span class="font-label-sm text-label-sm text-text-hint font-mono">namespace: config/app/telemetry</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-primary-soft text-primary font-label-sm text-label-sm font-semibold">Active Policy</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Latest Version Name</label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none" id="inp-ver-name" oninput="updateDevicePreview()" type="text" value="v1.4.2"/>
+<span class="absolute right-3 top-3 font-label-sm text-label-sm text-text-hint">Oct 20</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Latest Build Number</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none" id="inp-ver-build" oninput="updateDevicePreview()" type="number" value="318"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Minimum Enforced Build</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none text-error font-medium" id="inp-min-build" oninput="updateDevicePreview()" type="number" value="310"/>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-warning-soft flex items-start gap-3">
+<span class="material-symbols-outlined text-warning text-[20px] mt-0.5">warning</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-warning font-semibold">Strict Enforcement Threshold</span>
+<span class="font-body-sm text-body-sm text-text-secondary">
+              Any client running below build <strong>310</strong> is blocked with a non-dismissible mandatory update screen during app launch.
+            </span>
+</div>
+</div>
+<!-- Links inputs -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-text-secondary">Public APK Fallback Download Link</label>
+<span class="text-primary font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Reachable (200 OK)
+              </span>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<input class="w-full h-11 pl-3.5 pr-10 rounded-xl bg-surface-muted text-text-primary font-mono text-body-sm focus:bg-surface-container-lowest focus:outline-none truncate" id="apk-link" type="text" value="https://drive.google.com/uc?export=download&amp;id=1AbC789kLmN_XyZ"/>
+<button class="absolute right-2 top-2 p-1.5 rounded-lg text-text-hint hover:text-text-primary hover:bg-surface-container-high transition-colors" onclick="copyToClipboard('apk-link')" title="Copy URL">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+<button class="h-11 px-4 rounded-xl bg-surface-muted hover:bg-surface-container-high text-text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5" onclick="triggerToast('Validating SHA-256 binary hash... Verified.')">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Verify</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Direct OTA Update URL (Universal ARM64 / x86_64)</label>
+<div class="relative">
+<input class="w-full h-11 pl-3.5 pr-10 rounded-xl bg-surface-muted text-text-primary font-mono text-body-sm focus:bg-surface-container-lowest focus:outline-none" type="text" value="https://releases.libraryapp.org/ota/app-arm64-v1.4.2.apk"/>
+<button class="absolute right-2 top-2 p-1.5 rounded-lg text-text-hint hover:text-text-primary hover:bg-surface-container-high transition-colors" onclick="triggerToast('OTA link copied')">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Enforce switch -->
+<div class="pt-4 flex items-center justify-between bg-surface-muted p-4 rounded-xl">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-text-primary">Enforce Force Update Modal on Outdated Clients</span>
+<span class="font-body-sm text-body-sm text-text-secondary">When toggled, builds &lt; 310 render unclosable dialog with CTA directly to store/APK.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="force-update-toggle" onchange="toggleForceUpdate(this)" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</section>
+<!-- Card 2: Global In-App Announcement Banner -->
+<section class="rounded-2xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-6">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">campaign</span>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-text-primary">Global In-App Announcement Banner</h2>
+<span class="font-label-sm text-label-sm text-text-hint font-mono">namespace: config/notifications/broadcast</span>
+</div>
+</div>
+<!-- Toggle switch -->
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm font-semibold text-primary" id="announcement-status-text">Active</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="announcement-toggle" onchange="toggleAnnouncement(this)" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Banner Type Selector -->
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-text-secondary">Banner Type / Severity</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+<button class="banner-type-btn p-3 rounded-xl bg-surface-muted hover:bg-surface-container-high transition-all flex items-center gap-2" id="type-info" onclick="setBannerType('info')">
+<span class="w-2.5 h-2.5 rounded-full bg-accent"></span>
+<span class="font-label-sm text-label-sm text-text-primary font-medium">Info (Blue)</span>
+</button>
+<button class="banner-type-btn p-3 rounded-xl bg-secondary-soft text-secondary transition-all flex items-center gap-2 ring-2 ring-secondary" id="type-maintenance" onclick="setBannerType('maintenance')">
+<span class="w-2.5 h-2.5 rounded-full bg-warning"></span>
+<span class="font-label-sm text-label-sm font-semibold">Maintenance</span>
+</button>
+<button class="banner-type-btn p-3 rounded-xl bg-surface-muted hover:bg-surface-container-high transition-all flex items-center gap-2" id="type-urgent" onclick="setBannerType('urgent')">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="font-label-sm text-label-sm text-text-primary font-medium">Urgent (Red)</span>
+</button>
+<button class="banner-type-btn p-3 rounded-xl bg-surface-muted hover:bg-surface-container-high transition-all flex items-center gap-2" id="type-primary" onclick="setBannerType('primary')">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-text-primary font-medium">Notice (Green)</span>
+</button>
+</div>
+</div>
+<!-- Announcement Title & Body -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Announcement Title</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none" id="ann-title" oninput="updateDevicePreview()" type="text" value="Scheduled Maintenance: Sunday 02:00 UTC"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Announcement Message Body</label>
+<textarea class="w-full p-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none resize-none" id="ann-body" oninput="updateDevicePreview()" rows="3">Cloud synchronization will be paused for approximately 45 minutes for database indexing and Groq model upgrades.</textarea>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Action Button Label</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none" id="ann-btn-text" oninput="updateDevicePreview()" type="text" value="View Status Page"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Action Target URL</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-muted text-text-primary font-mono text-body-sm focus:bg-surface-container-lowest focus:outline-none" type="text" value="https://status.libraryapp.org/events/maint-104"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-text-secondary">Target Client Audience</label>
+<div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-muted">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-text-secondary">devices</span>
+<span class="font-body-md text-body-md text-text-primary font-medium">All Mobile Clients (iOS &amp; Android)</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">100% Cohort</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- RIGHT COLUMN (40% ~ 5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Real-time Mobile Preview Simulation -->
+<section class="rounded-2xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px]">phone_iphone</span>
+<h3 class="font-title-md text-title-md text-text-primary">Real-time Mobile Simulation</h3>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-muted p-1 rounded-lg">
+<button class="px-2.5 py-1 rounded-md font-label-sm text-label-sm font-semibold bg-white text-primary shadow-sm" id="sim-btn-banner" onclick="setSimMode('banner')">Banner</button>
+<button class="px-2.5 py-1 rounded-md font-label-sm text-label-sm font-medium text-text-secondary hover:text-text-primary" id="sim-btn-modal" onclick="setSimMode('modal')">Update Gate</button>
+</div>
+</div>
+<!-- Phone Shell Graphic -->
+<div class="w-full max-w-[320px] mx-auto rounded-[38px] bg-text-primary p-3 shadow-2xl relative">
+<!-- Dynamic Island / Speaker notch -->
+<div class="w-24 h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-end px-2">
+<div class="w-2 h-2 rounded-full bg-[#1c2e24]"></div>
+</div>
+<!-- Phone Inner Screen -->
+<div class="w-full h-[520px] rounded-[28px] bg-surface overflow-hidden relative flex flex-col justify-between p-3 select-none">
+<!-- Mobile App Top Bar -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between text-text-secondary font-label-sm text-label-sm px-1">
+<span>9:41</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[13px]">wifi</span>
+<span class="material-symbols-outlined text-[13px]">battery_full</span>
+</div>
+</div>
+<!-- Header within mobile app -->
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-md bg-primary text-white flex items-center justify-center font-bold text-[10px]">L</div>
+<span class="font-title-md text-title-md text-text-primary text-[13px]">The Collection</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-text-secondary">search</span>
+</div>
+<!-- Simulated Live Banner -->
+<div class="rounded-xl p-3 bg-secondary-soft text-text-primary flex flex-col gap-2 transition-all" id="sim-announcement-card">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-warning text-[16px]" id="sim-icon">build_circle</span>
+<span class="font-label-sm text-label-sm font-bold text-text-primary leading-tight" id="sim-banner-title">Scheduled Maintenance: Sunday 02:00 UTC</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary text-[11px] leading-relaxed" id="sim-banner-body">
+                  Cloud synchronization will be paused for approximately 45 minutes for database indexing and Groq model upgrades.
+                </p>
+<button class="self-start px-2.5 py-1 rounded-md bg-white text-text-primary font-label-sm text-label-sm text-[10px] font-semibold shadow-sm" id="sim-banner-btn">
+                  View Status Page
+                </button>
+</div>
+<!-- Mock App Content Rows -->
+<div class="flex flex-col gap-2 mt-1">
+<div class="p-2.5 rounded-xl bg-surface-container-lowest flex items-center gap-2.5">
+<div class="w-8 h-10 rounded bg-primary-soft"></div>
+<div class="flex flex-col gap-1 flex-1">
+<div class="h-2.5 w-20 bg-surface-container-high rounded"></div>
+<div class="h-2 w-12 bg-surface-muted rounded"></div>
+</div>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-lowest flex items-center gap-2.5">
+<div class="w-8 h-10 rounded bg-secondary-soft"></div>
+<div class="flex flex-col gap-1 flex-1">
+<div class="h-2.5 w-24 bg-surface-container-high rounded"></div>
+<div class="h-2 w-16 bg-surface-muted rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Forced Update Modal Overlay (Toggled via state) -->
+<div class="absolute inset-0 bg-text-primary/70 backdrop-blur-xs flex items-center justify-center p-4 hidden" id="sim-modal-overlay">
+<div class="w-full bg-surface-container-lowest rounded-2xl p-4 flex flex-col items-center text-center gap-3 shadow-2xl">
+<div class="w-12 h-12 rounded-full bg-error-soft text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">system_security_update</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-text-primary text-[14px]">Update Required</span>
+<span class="font-body-sm text-body-sm text-text-secondary text-[11px] mt-1">
+                    Your build (<span class="font-mono font-bold">308</span>) is no longer supported. Please upgrade to build <strong id="sim-modal-min">310</strong> to continue.
+                  </span>
+</div>
+<button class="w-full py-2 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
+                  Update Now (v<span id="sim-modal-latest">1.4.2</span>)
+                </button>
+</div>
+</div>
+<!-- Mock Bottom Nav -->
+<div class="flex items-center justify-around py-2 rounded-2xl bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary text-[18px]">menu_book</span>
+<span class="material-symbols-outlined text-text-hint text-[18px]">explore</span>
+<span class="material-symbols-outlined text-text-hint text-[18px]">person</span>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-text-hint text-center">Interactive device reflects config changes in real-time</span>
+</section>
+<!-- Version Adoption & Rollout Distribution -->
+<section class="rounded-2xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">donut_large</span>
+<h3 class="font-title-md text-title-md text-text-primary">Client Version Adoption</h3>
+</div>
+<span class="font-label-sm text-label-sm text-text-hint font-mono">48,290 Active</span>
+</div>
+<!-- Inline Visual Progress Bar -->
+<div class="w-full h-3 rounded-full bg-surface-muted overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 78.4%" title="Build 318 (78.4%)"></div>
+<div class="h-full bg-accent" style="width: 16.2%" title="Build 315 (16.2%)"></div>
+<div class="h-full bg-secondary" style="width: 4.1%" title="Build 310 (4.1%)"></div>
+<div class="h-full bg-error" style="width: 1.3%" title="Build &lt; 310 (1.3%)"></div>
+</div>
+<!-- Breakdown List -->
+<div class="flex flex-col gap-2.5 pt-1">
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="font-body-md text-body-md text-text-primary font-medium">Build 318 (Latest v1.4.2)</span>
+</div>
+<div class="flex items-center gap-2 font-mono text-label-sm text-label-sm">
+<span class="font-semibold text-text-primary">78.4%</span>
+<span class="text-text-hint">(37,860)</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-accent"></span>
+<span class="font-body-md text-body-md text-text-primary">Build 315 (v1.4.0)</span>
+</div>
+<div class="flex items-center gap-2 font-mono text-label-sm text-label-sm">
+<span class="font-semibold text-text-primary">16.2%</span>
+<span class="text-text-hint">(7,822)</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-body-md text-body-md text-text-primary">Build 310 (Min Supported)</span>
+</div>
+<div class="flex items-center gap-2 font-mono text-label-sm text-label-sm">
+<span class="font-semibold text-text-primary">4.1%</span>
+<span class="text-text-hint">(1,980)</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-error-soft text-error">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="font-body-md text-body-md font-semibold">Build &lt; 310 (Blocked clients)</span>
+</div>
+<div class="flex items-center gap-2 font-mono text-label-sm text-label-sm">
+<span class="font-bold">1.3%</span>
+<span class="opacity-80">(628 devices)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Revision History & Audit Trail -->
+<section class="rounded-2xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">history_edu</span>
+<h3 class="font-title-md text-title-md text-text-primary">Revision History</h3>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-medium hover:underline cursor-pointer">Compare</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Log 1: v42 -->
+<div class="flex items-start justify-between p-3 rounded-xl bg-surface-muted">
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[11px] mt-0.5">AC</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-text-primary">v42</span>
+<span class="px-1.5 py-0.2 rounded bg-primary-soft text-primary font-label-sm text-label-sm">Production</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-secondary">Bumped min build 305 → 310</span>
+<span class="font-label-sm text-label-sm text-text-hint">4 days ago • Alex Chen</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-text-primary" onclick="triggerToast('Loading v42 snapshot')">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+<!-- Log 2: v41 -->
+<div class="flex items-start justify-between p-3 rounded-xl bg-surface-muted">
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-accent text-white flex items-center justify-center font-bold text-[11px] mt-0.5">MV</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-text-primary">v41</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high text-text-secondary font-label-sm text-label-sm">Archived</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-secondary">Updated maintenance window timing</span>
+<span class="font-label-sm text-label-sm text-text-hint">12 days ago • Marcus Vance</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-text-primary" onclick="triggerToast('Loading v41 snapshot')">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+<!-- Log 3: v40 -->
+<div class="flex items-start justify-between p-3 rounded-xl bg-surface-muted">
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-[11px] mt-0.5">SJ</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-text-primary">v40</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high text-text-secondary font-label-sm text-label-sm">Archived</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-secondary">Published client build 315 release payload</span>
+<span class="font-label-sm text-label-sm text-text-hint">18 days ago • Sarah Jenkins</span>
+</div>
+</div>
+<button class="p-1.5 text-text-hint hover:text-text-primary" onclick="triggerToast('Loading v40 snapshot')">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Publish Confirmation Modal (Hidden by Default) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-text-primary/40 backdrop-blur-xs hidden" id="publish-modal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-3xl p-6 shadow-2xl flex flex-col gap-5">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-primary-soft text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[26px]">rocket_launch</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-title-lg text-title-lg text-text-primary">Deploy to Production (v43)</h3>
+<span class="font-body-sm text-body-sm text-text-secondary">This payload will be broadcast via Firebase &amp; Cloudflare CDN.</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-muted flex flex-col gap-2 font-mono text-label-sm text-label-sm">
+<div class="flex justify-between">
+<span class="text-text-hint">min_enforced_build:</span>
+<span class="text-error font-bold">310</span>
+</div>
+<div class="flex justify-between">
+<span class="text-text-hint">latest_version:</span>
+<span class="text-text-primary font-bold">v1.4.2 (318)</span>
+</div>
+<div class="flex justify-between">
+<span class="text-text-hint">broadcast_banner:</span>
+<span class="text-primary font-bold">Active (Maintenance)</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-3 pt-2">
+<button class="px-5 py-2.5 rounded-full bg-surface-muted text-text-secondary font-label-lg text-label-lg hover:bg-surface-container-high transition-colors" onclick="closePublishModal()">
+          Cancel
+        </button>
+<button class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-dark transition-all shadow-md flex items-center gap-2" onclick="confirmPublish()">
+<span class="material-symbols-outlined text-[18px]">publish</span>
+<span>Confirm &amp; Broadcast</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let currentBannerType = 'maintenance';
+  let bannerActive = true;
+  let forceUpdateActive = true;
+
+  function updateDevicePreview() {
+    const titleVal = document.getElementById('ann-title').value;
+    const bodyVal = document.getElementById('ann-body').value;
+    const btnVal = document.getElementById('ann-btn-text').value;
+    const verName = document.getElementById('inp-ver-name').value;
+    const minBuild = document.getElementById('inp-min-build').value;
+
+    const simTitle = document.getElementById('sim-banner-title');
+    const simBody = document.getElementById('sim-banner-body');
+    const simBtn = document.getElementById('sim-banner-btn');
+    const simModalLatest = document.getElementById('sim-modal-latest');
+    const simModalMin = document.getElementById('sim-modal-min');
+
+    if (simTitle) simTitle.textContent = titleVal;
+    if (simBody) simBody.textContent = bodyVal;
+    if (simBtn) simBtn.textContent = btnVal;
+    if (simModalLatest) simModalLatest.textContent = verName;
+    if (simModalMin) simModalMin.textContent = minBuild;
+  }
+
+  function setBannerType(type) {
+    currentBannerType = type;
+    const card = document.getElementById('sim-announcement-card');
+    const icon = document.getElementById('sim-icon');
+
+    // Reset button styles
+    document.querySelectorAll('.banner-type-btn').forEach(b => {
+      b.classList.remove('ring-2', 'ring-secondary', 'ring-accent', 'ring-error', 'ring-primary', 'bg-secondary-soft', 'bg-accent-soft', 'bg-error-soft', 'bg-primary-soft');
+      b.classList.add('bg-surface-muted');
+    });
+
+    const activeBtn = document.getElementById('type-' + type);
+    if (activeBtn) {
+      activeBtn.classList.remove('bg-surface-muted');
+      if (type === 'info') activeBtn.classList.add('bg-accent-soft', 'ring-2', 'ring-accent');
+      if (type === 'maintenance') activeBtn.classList.add('bg-secondary-soft', 'ring-2', 'ring-secondary');
+      if (type === 'urgent') activeBtn.classList.add('bg-error-soft', 'ring-2', 'ring-error');
+      if (type === 'primary') activeBtn.classList.add('bg-primary-soft', 'ring-2', 'ring-primary');
+    }
+
+    if (!card || !icon) return;
+
+    // Reset phone sim card styles
+    card.className = 'rounded-xl p-3 flex flex-col gap-2 transition-all';
+
+    if (type === 'info') {
+      card.classList.add('bg-accent-soft', 'text-text-primary');
+      icon.textContent = 'info';
+      icon.className = 'material-symbols-outlined text-accent text-[16px]';
+    } else if (type === 'maintenance') {
+      card.classList.add('bg-secondary-soft', 'text-text-primary');
+      icon.textContent = 'build_circle';
+      icon.className = 'material-symbols-outlined text-warning text-[16px]';
+    } else if (type === 'urgent') {
+      card.classList.add('bg-error-soft', 'text-text-primary');
+      icon.textContent = 'report';
+      icon.className = 'material-symbols-outlined text-error text-[16px]';
+    } else if (type === 'primary') {
+      card.classList.add('bg-primary-soft', 'text-text-primary');
+      icon.textContent = 'campaign';
+      icon.className = 'material-symbols-outlined text-primary text-[16px]';
+    }
+
+    triggerToast(`Banner type switched to ${type}`);
+  }
+
+  function toggleAnnouncement(elem) {
+    bannerActive = elem.checked;
+    const simCard = document.getElementById('sim-announcement-card');
+    const label = document.getElementById('announcement-status-text');
+
+    if (bannerActive) {
+      if (simCard) simCard.classList.remove('opacity-20', 'grayscale');
+      if (label) {
+        label.textContent = 'Active';
+        label.className = 'font-label-sm text-label-sm font-semibold text-primary';
+      }
+      triggerToast('In-App Announcement enabled');
+    } else {
+      if (simCard) simCard.classList.add('opacity-20', 'grayscale');
+      if (label) {
+        label.textContent = 'Disabled';
+        label.className = 'font-label-sm text-label-sm font-semibold text-text-hint';
+      }
+      triggerToast('In-App Announcement disabled');
+    }
+  }
+
+  function toggleForceUpdate(elem) {
+    forceUpdateActive = elem.checked;
+    triggerToast(`Mandatory update modal enforcement: ${forceUpdateActive ? 'ENABLED' : 'DISABLED'}`);
+  }
+
+  function setSimMode(mode) {
+    const overlay = document.getElementById('sim-modal-overlay');
+    const btnBanner = document.getElementById('sim-btn-banner');
+    const btnModal = document.getElementById('sim-btn-modal');
+
+    if (mode === 'modal') {
+      overlay.classList.remove('hidden');
+      btnModal.className = 'px-2.5 py-1 rounded-md font-label-sm text-label-sm font-semibold bg-white text-primary shadow-sm';
+      btnBanner.className = 'px-2.5 py-1 rounded-md font-label-sm text-label-sm font-medium text-text-secondary hover:text-text-primary';
+    } else {
+      overlay.classList.add('hidden');
+      btnBanner.className = 'px-2.5 py-1 rounded-md font-label-sm text-label-sm font-semibold bg-white text-primary shadow-sm';
+      btnModal.className = 'px-2.5 py-1 rounded-md font-label-sm text-label-sm font-medium text-text-secondary hover:text-text-primary';
+    }
+  }
+
+  function copyToClipboard(id) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    navigator.clipboard?.writeText(input.value);
+    triggerToast('Download link copied to clipboard');
+  }
+
+  function openPublishModal() {
+    const modal = document.getElementById('publish-modal');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closePublishModal() {
+    const modal = document.getElementById('publish-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function confirmPublish() {
+    closePublishModal();
+    triggerToast('Config v43 successfully published to 48,290 devices!');
+  }
+</script></main>
+</div>
+<!-- Interactive JS -->
+<script>
+  let currentSelected = 'sarah';
+  let isSuspended = false;
+
+  const userData = {
+    sarah: {
+      name: 'Sarah Jenkins',
+      handle: '@sarah_collector',
+      avatar: 'SJ',
+      role: 'Admin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '4,218,940',
+      scans: '1,420'
+    },
+    marcus: {
+      name: 'Marcus Vance',
+      handle: '@marcus_v',
+      avatar: 'MV',
+      role: 'Superadmin',
+      isAdmin: true,
+      suspended: false,
+      tokens: '11,840,120',
+      scans: '5,890'
+    },
+    elena: {
+      name: 'Elena Rostova',
+      handle: '@elena_books',
+      avatar: 'ER',
+      role: 'Member',
+      isAdmin: false,
+      suspended: true,
+      tokens: '840,190',
+      scans: '312'
+    },
+    tobias: {
+      name: 'Tobias Sterling',
+      handle: '@tobias_lit',
+      avatar: 'TS',
+      role: 'Curator',
+      isAdmin: false,
+      suspended: false,
+      tokens: '2,104,300',
+      scans: '945'
+    },
+    maya: {
+      name: 'Maya Lin',
+      handle: '@mayalib',
+      avatar: 'ML',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '6,712,400',
+      scans: '2,880'
+    },
+    devrim: {
+      name: 'Devrim Kaya',
+      handle: '@devrim_arch',
+      avatar: 'DK',
+      role: 'Member',
+      isAdmin: false,
+      suspended: false,
+      tokens: '320,110',
+      scans: '140'
+    }
+  };
+
+  function selectUser(key) {
+    currentSelected = key;
+    const data = userData[key];
+    if (!data) return;
+
+    document.querySelectorAll('.user-row').forEach(row => {
+      row.classList.remove('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspect';
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-text-secondary');
+      }
+    });
+
+    const selectedRow = document.getElementById('row-' + key);
+    if (selectedRow) {
+      selectedRow.classList.add('bg-[rgba(47,107,79,0.04)]', 'border-l-2', 'border-l-primary');
+      const btn = selectedRow.querySelector('button');
+      if (btn) {
+        btn.textContent = 'Inspecting';
+        btn.classList.add('text-primary');
+        btn.classList.remove('text-text-secondary');
+      }
+    }
+
+    // Update inspector
+    document.getElementById('inspector-name').textContent = data.name;
+    document.getElementById('inspector-handle').textContent = data.handle;
+    document.getElementById('inspector-avatar').textContent = data.avatar;
+    document.getElementById('inspector-badge').textContent = data.role;
+    document.getElementById('metric-tokens').textContent = data.tokens;
+    document.getElementById('metric-scans').textContent = data.scans;
+
+    const adminToggle = document.getElementById('admin-claim-toggle');
+    if (adminToggle) {
+      adminToggle.checked = data.isAdmin;
+    }
+
+    isSuspended = data.suspended;
+    updateSuspendButtonState();
+
+    triggerToast(`Viewing record for ${data.name}`);
+  }
+
+  function toggleAdminClaim(checkbox) {
+    const targetUser = userData[currentSelected];
+    if (!targetUser) return;
+    targetUser.isAdmin = checkbox.checked;
+    targetUser.role = checkbox.checked ? 'Admin' : 'Member';
+    document.getElementById('inspector-badge').textContent = targetUser.role;
+    triggerToast(`Admin privilege ${checkbox.checked ? 'granted to' : 'revoked from'} ${targetUser.name}`);
+  }
+
+  function handleRevokeTokens() {
+    const data = userData[currentSelected];
+    triggerToast(`Active sessions revoked for ${data.handle}`);
+  }
+
+  function handleToggleSuspend() {
+    isSuspended = !isSuspended;
+    userData[currentSelected].suspended = isSuspended;
+    updateSuspendButtonState();
+    triggerToast(isSuspended ? `Account suspended for ${userData[currentSelected].name}` : `Account reactivated for ${userData[currentSelected].name}`);
+  }
+
+  function updateSuspendButtonState() {
+    const label = document.getElementById('suspend-label');
+    const btn = document.getElementById('suspend-btn');
+    if (isSuspended) {
+      label.textContent = 'Reactivate User Account';
+      btn.classList.remove('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.add('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    } else {
+      label.textContent = 'Suspend User Account';
+      btn.classList.add('border-error/30', 'text-error', 'hover:bg-error-soft/60');
+      btn.classList.remove('border-primary/30', 'text-primary', 'hover:bg-primary-soft');
+    }
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('user-search-input');
+    if (input) input.value = '';
+    selectUser('sarah');
+    triggerToast('Filters reset to default');
+  }
+
+  let toastTimeout;
+  function triggerToast(message) {
+    const banner = document.getElementById('toast-banner');
+    const msg = document.getElementById('toast-msg');
+    if (!banner || !msg) return;
+
+    msg.textContent = message;
+    banner.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.add('translate-y-0', 'opacity-100');
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      dismissToast();
+    }, 2800);
+  }
+
+  function dismissToast() {
+    const banner = document.getElementById('toast-banner');
+    if (!banner) return;
+    banner.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    banner.classList.remove('translate-y-0', 'opacity-100');
+  }
+</script>
+<!-- Slide-over Drawer / Sheet Overlay -->
+</body></html>

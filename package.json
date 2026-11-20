@@ -2,11 +2,12 @@
   "name": "shelf-snap-groq-wrapper",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node server.ts",
+    "start": "node dist/src/server.js",
+    "dev": "nodemon",
+    "grant-admin": "ts-node scripts/grant-admin.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -32,6 +33,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.3",
+    "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
